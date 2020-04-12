@@ -3,13 +3,13 @@ use std::cmp;
 use std::ops::{Bound, RangeBounds};
 
 /// ある数列の、指定された範囲の和を高速に計算します。
-pub struct Line<T> {
+pub struct CumSum<T> {
     sum: Vec<T>,
 }
 
-impl<T: Group + Copy> Line<T> {
-    /// 与えられた数列の累積和をとり、 `Line` を生成します。
-    pub fn from_array<A: AsRef<[T]>>(array: A) -> Line<T> {
+impl<T: Group + Copy> CumSum<T> {
+    /// 与えられた数列の累積和をとり、 `CumSum` を生成します。
+    pub fn from_array<A: AsRef<[T]>>(array: A) -> CumSum<T> {
         let array = array.as_ref();
         let mut sum = vec![T::zero(); array.len() + 1];
         for i in 1..=array.len() {
@@ -18,7 +18,7 @@ impl<T: Group + Copy> Line<T> {
             }
         }
 
-        Line { sum }
+        CumSum { sum }
     }
 
     /// 指定された範囲内の総和を返します。
@@ -38,13 +38,13 @@ impl<T: Group + Copy> Line<T> {
 }
 
 // ある二次元数列の、指定された範囲の和を高速に計算します。
-pub struct Plane<T> {
+pub struct CumSum2D<T> {
     sum: Vec<Vec<T>>,
 }
 
-impl<T: Group + Copy> Plane<T> {
-    /// 与えられた行列の累積和をとり、 `Line` を生成します。
-    pub fn from_matrix<M, A>(matrix: M) -> Plane<T>
+impl<T: Group + Copy> CumSum2D<T> {
+    /// 与えられた行列の累積和をとり、 `CumSum2D` を生成します。
+    pub fn from_matrix<M, A>(matrix: M) -> CumSum2D<T>
     where
         M: AsRef<[A]>,
         A: AsRef<[T]>,
@@ -52,7 +52,7 @@ impl<T: Group + Copy> Plane<T> {
         let array = matrix.as_ref();
         let height = array.len();
         if height == 0 {
-            return Plane {
+            return CumSum2D {
                 sum: vec![vec![T::zero()]],
             };
         }
@@ -78,7 +78,7 @@ impl<T: Group + Copy> Plane<T> {
             }
         }
 
-        Plane { sum }
+        CumSum2D { sum }
     }
 
     /// 指定された範囲内の総和を返します。
@@ -149,32 +149,32 @@ mod tests {
     }
 
     #[test]
-    fn check_line() {
-        let line = Line::from_array(&[5, 4, 1, 3, 2, 6]);
-        assert_eq!(line.sum(0..6), 21);
-        assert_eq!(line.sum(0..=5), 21);
-        assert_eq!(line.sum(..6), 21);
-        assert_eq!(line.sum(..=5), 21);
-        assert_eq!(line.sum(0..), 21);
-        assert_eq!(line.sum(..), 21);
-        assert_eq!(line.sum(1..2), 4);
-        assert_eq!(line.sum(1..5), 10);
-        assert_eq!(line.sum(1..=1), 4);
-        assert_eq!(line.sum(1..0), 0);
+    fn check_cumsum() {
+        let cumsum = CumSum::from_array(&[5, 4, 1, 3, 2, 6]);
+        assert_eq!(cumsum.sum(0..6), 21);
+        assert_eq!(cumsum.sum(0..=5), 21);
+        assert_eq!(cumsum.sum(..6), 21);
+        assert_eq!(cumsum.sum(..=5), 21);
+        assert_eq!(cumsum.sum(0..), 21);
+        assert_eq!(cumsum.sum(..), 21);
+        assert_eq!(cumsum.sum(1..2), 4);
+        assert_eq!(cumsum.sum(1..5), 10);
+        assert_eq!(cumsum.sum(1..=1), 4);
+        assert_eq!(cumsum.sum(1..0), 0);
     }
 
     #[test]
-    fn check_plane() {
-        let plane = Plane::from_matrix(vec![
+    fn check_cumsum2d() {
+        let cumsum2d = CumSum2D::from_matrix(vec![
             vec![4, 2, 3, 6, 1],
             vec![5, 5, 2, 1, 4],
             vec![1, 2, 3, 2, 2],
             vec![3, 2, 1, 3, 2],
         ]);
-        assert_eq!(plane.sum(0..2, 3..4), 7);
-        assert_eq!(plane.sum(.., ..), 54);
-        assert_eq!(plane.sum(1..3, 2..4), 8);
-        assert_eq!(plane.sum(3..2, 3..4), 0);
-        assert_eq!(plane.sum(1..2, 4..3), 0);
+        assert_eq!(cumsum2d.sum(0..2, 3..4), 7);
+        assert_eq!(cumsum2d.sum(.., ..), 54);
+        assert_eq!(cumsum2d.sum(1..3, 2..4), 8);
+        assert_eq!(cumsum2d.sum(3..2, 3..4), 0);
+        assert_eq!(cumsum2d.sum(1..2, 4..3), 0);
     }
 }
