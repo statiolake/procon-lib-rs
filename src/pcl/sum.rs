@@ -8,12 +8,13 @@ pub struct Line<T> {
 }
 
 impl<T: Group + Copy> Line<T> {
-    /// 与えられたスライスの累積和をとり、 `Line` を生成します。
-    pub fn from_slice(slice: &[T]) -> Line<T> {
-        let mut sum = vec![T::zero(); slice.len() + 1];
-        for i in 1..=slice.len() {
+    /// 与えられた数列の累積和をとり、 `Line` を生成します。
+    pub fn from_array<A: AsRef<[T]>>(array: A) -> Line<T> {
+        let array = array.as_ref();
+        let mut sum = vec![T::zero(); array.len() + 1];
+        for i in 1..=array.len() {
             unsafe {
-                *sum.get_unchecked_mut(i) = *sum.get_unchecked(i - 1) + *slice.get_unchecked(i - 1);
+                *sum.get_unchecked_mut(i) = *sum.get_unchecked(i - 1) + *array.get_unchecked(i - 1);
             }
         }
 
@@ -62,7 +63,7 @@ mod tests {
 
     #[test]
     fn check_line() {
-        let line = Line::from_slice(&[5, 4, 1, 3, 2, 6]);
+        let line = Line::from_array(&[5, 4, 1, 3, 2, 6]);
         assert_eq!(line.sum(0..6), 21);
         assert_eq!(line.sum(0..=5), 21);
         assert_eq!(line.sum(..6), 21);
