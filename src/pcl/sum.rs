@@ -22,20 +22,11 @@ impl<T: Group + Copy> Line<T> {
 
     /// 指定された範囲内の総和を返します。
     pub fn sum<R: RangeBounds<usize>>(&self, range: R) -> T {
-        let array_len = self.sum.len() - 1;
+        // 最初の配列の長さ
+        let orig_len = self.sum.len() - 1;
 
-        let start = match range.start_bound() {
-            Bound::Included(&x) => x,
-            Bound::Excluded(&x) => x + 1,
-            Bound::Unbounded => 0,
-        };
-
-        let end = match range.end_bound() {
-            Bound::Included(&x) => x + 1,
-            Bound::Excluded(&x) => x,
-            Bound::Unbounded => array_len,
-        };
-        let end = cmp::min(end, array_len);
+        let start = range_start(&range, 0);
+        let end = range_end(&range, orig_len);
 
         if end <= start {
             return T::zero();
@@ -43,6 +34,26 @@ impl<T: Group + Copy> Line<T> {
 
         unsafe { *self.sum.get_unchecked(end) - *self.sum.get_unchecked(start) }
     }
+}
+
+fn range_start<R: RangeBounds<usize>>(range: &R, min: usize) -> usize {
+    let start = match range.start_bound() {
+        Bound::Included(&x) => x,
+        Bound::Excluded(&x) => x + 1,
+        Bound::Unbounded => 0,
+    };
+
+    cmp::max(start, min)
+}
+
+fn range_end<R: RangeBounds<usize>>(range: &R, max: usize) -> usize {
+    let end = match range.end_bound() {
+        Bound::Included(&x) => x + 1,
+        Bound::Excluded(&x) => x,
+        Bound::Unbounded => max,
+    };
+
+    cmp::min(end, max)
 }
 
 #[cfg(test)]
