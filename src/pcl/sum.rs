@@ -37,6 +37,79 @@ impl<T: Group + Copy> Line<T> {
     }
 }
 
+// ある二次元数列の、指定された範囲の和を高速に計算します。
+pub struct Plane<T> {
+    sum: Vec<Vec<T>>,
+}
+
+impl<T: Group + Copy> Plane<T> {
+    /// 与えられた行列の累積和をとり、 `Line` を生成します。
+    pub fn from_matrix<M, A>(matrix: M) -> Plane<T>
+    where
+        M: AsRef<[A]>,
+        A: AsRef<[T]>,
+    {
+        let array = matrix.as_ref();
+        let height = array.len();
+        if height == 0 {
+            return Plane {
+                sum: vec![vec![T::zero()]],
+            };
+        }
+
+        let width = unsafe { array.get_unchecked(0) }.as_ref().len();
+        let mut sum = vec![vec![T::zero(); width + 1]; height + 1];
+
+        for i in 1..=height {
+            for j in 1..=width {
+                assert_eq!(
+                    unsafe { array.get_unchecked(i - 1) }.as_ref().len(),
+                    width,
+                    "the array's length is differ line by line"
+                );
+
+                unsafe {
+                    *sum.get_unchecked_mut(i).get_unchecked_mut(j) =
+                        *sum.get_unchecked(i - 1).get_unchecked(j)
+                            + *sum.get_unchecked(i).get_unchecked(j - 1)
+                            - *sum.get_unchecked(i - 1).get_unchecked(j - 1)
+                            + *array.get_unchecked(i - 1).as_ref().get_unchecked(j - 1)
+                }
+            }
+        }
+
+        Plane { sum }
+    }
+
+    /// 指定された範囲内の総和を返します。
+    pub fn sum<RY, RX>(&self, yrange: RY, xrange: RX) -> T
+    where
+        RY: RangeBounds<usize>,
+        RX: RangeBounds<usize>,
+    {
+        // 最初の配列の長さ
+        let orig_height = self.sum.len() - 1;
+        // safety: self.sum は必ず要素を一つは含む (`vec![vec![0]]` が最小)
+        let orig_width = unsafe { self.sum.get_unchecked(0).len() } - 1;
+
+        let ystart = range_start(&yrange, 0);
+        let yend = range_end(&yrange, orig_height);
+        let xstart = range_start(&xrange, 0);
+        let xend = range_end(&xrange, orig_width);
+
+        if yend <= ystart || xend <= xstart {
+            return T::zero();
+        }
+
+        unsafe {
+            *self.sum.get_unchecked(yend).get_unchecked(xend)
+                + *self.sum.get_unchecked(ystart).get_unchecked(xstart)
+                - *self.sum.get_unchecked(ystart).get_unchecked(xend)
+                - *self.sum.get_unchecked(yend).get_unchecked(xstart)
+        }
+    }
+}
+
 fn range_start<R: RangeBounds<usize>>(range: &R, min: usize) -> usize {
     let start = match range.start_bound() {
         Bound::Included(&x) => x,
@@ -88,5 +161,20 @@ mod tests {
         assert_eq!(line.sum(1..5), 10);
         assert_eq!(line.sum(1..=1), 4);
         assert_eq!(line.sum(1..0), 0);
+    }
+
+    #[test]
+    fn check_plane() {
+        let plane = Plane::from_matrix(vec![
+            vec![4, 2, 3, 6, 1],
+            vec![5, 5, 2, 1, 4],
+            vec![1, 2, 3, 2, 2],
+            vec![3, 2, 1, 3, 2],
+        ]);
+        assert_eq!(plane.sum(0..2, 3..4), 7);
+        assert_eq!(plane.sum(.., ..), 54);
+        assert_eq!(plane.sum(1..3, 2..4), 8);
+        assert_eq!(plane.sum(3..2, 3..4), 0);
+        assert_eq!(plane.sum(1..2, 4..3), 0);
     }
 }
