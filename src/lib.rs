@@ -1,3 +1,5 @@
+pub mod pcl;
+
 #[cfg(test)]
 mod tests {
     #[test]
