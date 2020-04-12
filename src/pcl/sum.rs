@@ -62,6 +62,20 @@ mod tests {
     use super::*;
 
     #[test]
+    fn check_bounds() {
+        assert_eq!(range_start(&(0..1), 0), 0);
+        assert_eq!(range_start(&(0..=1), 0), 0);
+        assert_eq!(range_start(&(..1), 0), 0);
+        assert_eq!(range_start(&(0..), 0), 0);
+        assert_eq!(range_start(&(..), 0), 0);
+        assert_eq!(range_end(&(0..1), 1), 1);
+        assert_eq!(range_end(&(0..=1), 1), 1);
+        assert_eq!(range_end(&(..1), 1), 1);
+        assert_eq!(range_end(&(0..), 1), 1);
+        assert_eq!(range_end(&(..), 1), 1);
+    }
+
+    #[test]
     fn check_line() {
         let line = Line::from_array(&[5, 4, 1, 3, 2, 6]);
         assert_eq!(line.sum(0..6), 21);
