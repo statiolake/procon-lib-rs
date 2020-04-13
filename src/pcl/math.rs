@@ -2,6 +2,7 @@ use num::{Num, One, Zero};
 use std::cmp::Ordering;
 use std::fmt;
 use std::hash::{Hash, Hasher};
+use std::iter::{Product, Sum};
 use std::marker::PhantomData;
 use std::mem;
 use std::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Rem, RemAssign, Sub, SubAssign};
@@ -197,6 +198,18 @@ impl<C: ModintConst> One for Modint<C> {
     }
 }
 
+impl<C: ModintConst> Sum for Modint<C> {
+    fn sum<I: Iterator<Item = Modint<C>>>(iter: I) -> Modint<C> {
+        iter.fold(Modint::zero(), Add::add)
+    }
+}
+
+impl<C: ModintConst> Product for Modint<C> {
+    fn product<I: Iterator<Item = Modint<C>>>(iter: I) -> Self {
+        iter.fold(Modint::one(), Mul::mul)
+    }
+}
+
 impl<C: ModintConst> Zero for Modint<C> {
     fn zero() -> Modint<C> {
         unsafe { Modint::new_unchecked(0) }
@@ -251,6 +264,22 @@ mod tests {
         assert_eq!(a, M::new(1));
         a /= b;
         assert_eq!(a, M::new(2));
+
+        assert_eq!(
+            [M::new(1), M::new(2), M::new(3), M::new(4)]
+                .iter()
+                .copied()
+                .sum::<M>(),
+            M::new(0)
+        );
+
+        assert_eq!(
+            [M::new(1), M::new(2), M::new(3), M::new(4)]
+                .iter()
+                .copied()
+                .product::<M>(),
+            M::new(4)
+        );
 
         assert_eq!(num::pow(a, 10), M::new(4));
     }
