@@ -4,7 +4,7 @@ use std::fmt;
 use std::hash::{Hash, Hasher};
 use std::marker::PhantomData;
 use std::mem;
-use std::ops::{Add, Div, Mul, Rem, Sub};
+use std::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Rem, RemAssign, Sub, SubAssign};
 
 /// `Modint` が扱う型。諸々の必要な条件を満たすのは結局ほぼプリミティブ整数しか
 /// なく、さらに実際 1e9+7 などの特有の法が使われることが多いため、ジェネリクス
@@ -126,64 +126,69 @@ impl<C> Clone for Modint<C> {
 
 impl<C> Copy for Modint<C> {}
 
-impl<C: ModintConst> Add for Modint<C> {
-    type Output = Modint<C>;
-    fn add(self, rhs: Modint<C>) -> Modint<C> {
-        let mut value = self.value + rhs.value;
-        if value >= C::MOD {
-            value -= C::MOD;
+impl<C: ModintConst> AddAssign for Modint<C> {
+    fn add_assign(&mut self, rhs: Modint<C>) {
+        self.value += rhs.value;
+        if self.value >= C::MOD {
+            self.value -= C::MOD;
         }
-
-        unsafe { Modint::new_unchecked(value) }
     }
 }
 
-impl<C: ModintConst> Sub for Modint<C> {
-    type Output = Modint<C>;
-    fn sub(self, rhs: Modint<C>) -> Modint<C> {
-        let mut value = self.value - rhs.value;
-        if value < 0 {
-            value += C::MOD;
+impl<C: ModintConst> SubAssign for Modint<C> {
+    fn sub_assign(&mut self, rhs: Modint<C>) {
+        self.value -= rhs.value;
+        if self.value < 0 {
+            self.value += C::MOD;
         }
-
-        unsafe { Modint::new_unchecked(value) }
     }
 }
 
-impl<C: ModintConst> Mul for Modint<C> {
-    type Output = Modint<C>;
-    fn mul(self, rhs: Modint<C>) -> Modint<C> {
-        let value = self.value * rhs.value % C::MOD;
-        unsafe { Modint::new_unchecked(value) }
+impl<C: ModintConst> MulAssign for Modint<C> {
+    fn mul_assign(&mut self, rhs: Modint<C>) {
+        self.value *= rhs.value;
+        self.value %= C::MOD;
     }
 }
 
-impl<C: ModintConst> Div for Modint<C> {
-    type Output = Modint<C>;
-
-    // おそらく割り算を計算するのに `*` が入っているから clippy が警告を出す。
-    #[allow(clippy::suspicious_arithmetic_impl)]
-    fn div(self, rhs: Modint<C>) -> Modint<C> {
+impl<C: ModintConst> DivAssign for Modint<C> {
+    fn div_assign(&mut self, rhs: Modint<C>) {
         if rhs.value == 0 {
             panic!("attempted to divide by zero");
         }
 
-        self * rhs.inv()
+        *self *= rhs.inv();
     }
 }
 
-// Num の条件を満たすため仕方ない
-impl<C: ModintConst> Rem for Modint<C> {
-    type Output = Modint<C>;
-    fn rem(self, rhs: Modint<C>) -> Modint<C> {
+// Num の条件を満たすため仕方なく
+impl<C: ModintConst> RemAssign for Modint<C> {
+    fn rem_assign(&mut self, rhs: Modint<C>) {
         if rhs.value == 0 {
             panic!("attempted to divide by zero.")
         }
 
-        let value = self.value % rhs.value;
-        unsafe { Modint::new_unchecked(value) }
+        self.value %= rhs.value;
     }
 }
+
+macro_rules! impl_arith_by_assign {
+    (impl $trait:ident::$fnname:ident { use $op:tt; }) => {
+        impl<C: ModintConst> $trait for Modint<C> {
+            type Output = Modint<C>;
+            fn $fnname(mut self, rhs: Modint<C>) -> Modint<C> {
+                self $op rhs;
+                self
+            }
+        }
+    };
+}
+
+impl_arith_by_assign!(impl Add::add { use +=; });
+impl_arith_by_assign!(impl Sub::sub { use -=; });
+impl_arith_by_assign!(impl Mul::mul { use *=; });
+impl_arith_by_assign!(impl Div::div { use /=; });
+impl_arith_by_assign!(impl Rem::rem { use %=; });
 
 impl<C: ModintConst> One for Modint<C> {
     fn one() -> Modint<C> {
@@ -227,7 +232,7 @@ mod tests {
 
     #[test]
     fn modint() {
-        let a = M::new(2);
+        let mut a = M::new(2);
         let b = M::new(3);
 
         assert_eq!(a + b, M::new(0));
@@ -237,6 +242,15 @@ mod tests {
         assert_eq!(b.inv(), M::new(2));
         assert_eq!(a / b, M::new(4));
         assert_eq!(b % a, M::new(1));
+
+        a *= b;
+        assert_eq!(a, M::new(1));
+        a -= b;
+        assert_eq!(a, M::new(3));
+        a += b;
+        assert_eq!(a, M::new(1));
+        a /= b;
+        assert_eq!(a, M::new(2));
 
         assert_eq!(num::pow(a, 10), M::new(4));
     }
