@@ -20,8 +20,8 @@ pub trait ModintConst {
 macro_rules! define_modint_const {
     (pub const $name:ident = $value:literal;) => {
         pub enum $name {}
-        impl crate::pcl::math::ModintConst for $name {
-            const MOD: crate::pcl::math::ModintInnerType = $value;
+        impl crate::pcl::math::modint::ModintConst for $name {
+            const MOD: crate::pcl::math::modint::ModintInnerType = $value;
         }
     };
 }
