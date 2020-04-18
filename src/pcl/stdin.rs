@@ -6,6 +6,14 @@ pub fn read<T: FromStr>() -> T {
     read_read(stdin())
 }
 
+pub fn read_byte() -> u8 {
+    stdin()
+        .bytes()
+        .next()
+        .unwrap()
+        .unwrap_or_else(|_| panic!("failed to get a byte"))
+}
+
 pub fn read_line() -> String {
     let mut s = String::new();
     stdin().read_line(&mut s).unwrap();
