@@ -1,4 +1,6 @@
 #[cfg(feature = "rust2016")]
+pub mod polyfil;
+#[cfg(feature = "rust2016")]
 pub mod stdin;
 
 #[cfg(feature = "rust2020")]

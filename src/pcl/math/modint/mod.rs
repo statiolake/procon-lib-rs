@@ -1,4 +1,18 @@
+#[cfg(feature = "rust2020")]
+#[path = "consts_2020.rs"]
+#[macro_use]
+pub mod consts;
+#[cfg(feature = "rust2016")]
+#[path = "consts_2016.rs"]
+#[macro_use]
+pub mod consts;
+
+#[cfg(feature = "rust2020")]
 use num::{Num, One, Zero};
+#[cfg(feature = "rust2016")]
+use pcl::polyfil::num::{One, Zero};
+
+use self::consts::ModintConst;
 use std::cmp::Ordering;
 use std::fmt;
 use std::hash::{Hash, Hasher};
@@ -11,20 +25,6 @@ use std::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Rem, RemAssign, S
 /// なく、さらに実際 1e9+7 などの特有の法が使われることが多いため、ジェネリクス
 /// として定義するほどの意味がなくなっており、ジェネリクスにしないことにする。
 pub type ModintInnerType = i64;
-
-pub trait ModintConst {
-    const MOD: ModintInnerType;
-}
-
-#[macro_export]
-macro_rules! define_modint_const {
-    (pub const $name:ident = $value:literal;) => {
-        pub enum $name {}
-        impl crate::pcl::math::modint::ModintConst for $name {
-            const MOD: crate::pcl::math::modint::ModintInnerType = $value;
-        }
-    };
-}
 
 define_modint_const! {
     pub const MOD17 = 1_000_000_007;
@@ -45,8 +45,9 @@ impl<C> Modint<C> {
     ///
     /// - `0 <= value < C::MOD` を満たすこと。
     pub unsafe fn new_unchecked(value: ModintInnerType) -> Modint<C> {
+        #[allow(unknown_lints, renamed_and_removed_lints, redundant_field_names)]
         Modint {
-            value,
+            value: value,
             marker: PhantomData,
         }
     }
@@ -60,26 +61,35 @@ impl<C> Modint<C> {
 impl<C: ModintConst> Modint<C> {
     /// 新しい Modint を作成する。値は最初に丸められる。
     pub fn new(mut value: ModintInnerType) -> Modint<C> {
-        assert_ne!(C::MOD, 0, "MOD is 0");
+        #[cfg(feature = "rust2020")]
+        let modulus = C::MOD;
+        #[cfg(feature = "rust2016")]
+        let modulus = C::get_modulus();
+
+        assert_ne!(modulus, 0, "MOD is 0");
         if value < 0 {
-            let m = (-value) / C::MOD;
-            value += (m + 1) * C::MOD;
+            let m = (-value) / modulus;
+            value += (m + 1) * modulus;
         }
 
-        unsafe { Modint::new_unchecked(value % C::MOD) }
+        unsafe { Modint::new_unchecked(value % modulus) }
     }
 
     /// 逆元を求める。
     pub fn inv(self) -> Modint<C> {
+        #[cfg(feature = "rust2020")]
+        let mut modulus = C::MOD;
+        #[cfg(feature = "rust2016")]
+        let mut modulus = C::get_modulus();
+
         let mut a = self.value;
-        let mut modulo = C::MOD;
         let mut u = 1;
         let mut v = 0;
-        while modulo > 0 {
-            let t = a / modulo;
-            a -= t * modulo;
+        while modulus > 0 {
+            let t = a / modulus;
+            a -= t * modulus;
             u -= t * v;
-            mem::swap(&mut a, &mut modulo);
+            mem::swap(&mut a, &mut modulus);
             mem::swap(&mut u, &mut v);
         }
 
@@ -114,7 +124,7 @@ impl<C: ModintConst> Hash for Modint<C> {
 }
 
 impl<C> fmt::Debug for Modint<C> {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+    fn fmt<'a>(&self, f: &mut fmt::Formatter<'a>) -> fmt::Result {
         write!(f, "{}", self.inner())
     }
 }
@@ -129,26 +139,41 @@ impl<C> Copy for Modint<C> {}
 
 impl<C: ModintConst> AddAssign for Modint<C> {
     fn add_assign(&mut self, rhs: Modint<C>) {
+        #[cfg(feature = "rust2020")]
+        let modulus = C::MOD;
+        #[cfg(feature = "rust2016")]
+        let modulus = C::get_modulus();
+
         self.value += rhs.value;
-        if self.value >= C::MOD {
-            self.value -= C::MOD;
+        if self.value >= modulus {
+            self.value -= modulus;
         }
     }
 }
 
 impl<C: ModintConst> SubAssign for Modint<C> {
     fn sub_assign(&mut self, rhs: Modint<C>) {
+        #[cfg(feature = "rust2020")]
+        let modulus = C::MOD;
+        #[cfg(feature = "rust2016")]
+        let modulus = C::get_modulus();
+
         self.value -= rhs.value;
         if self.value < 0 {
-            self.value += C::MOD;
+            self.value += modulus;
         }
     }
 }
 
 impl<C: ModintConst> MulAssign for Modint<C> {
     fn mul_assign(&mut self, rhs: Modint<C>) {
+        #[cfg(feature = "rust2020")]
+        let modulus = C::MOD;
+        #[cfg(feature = "rust2016")]
+        let modulus = C::get_modulus();
+
         self.value *= rhs.value;
-        self.value %= C::MOD;
+        self.value %= modulus;
     }
 }
 
@@ -174,8 +199,8 @@ impl<C: ModintConst> RemAssign for Modint<C> {
 }
 
 macro_rules! impl_arith_by_assign {
-    (impl $trait:ident::$fnname:ident { use $op:tt; }) => {
-        impl<C: ModintConst> $trait for Modint<C> {
+    (impl $traitname:ident::$fnname:ident { use $op:tt; }) => {
+        impl<C: ModintConst> $traitname for Modint<C> {
             type Output = Modint<C>;
             fn $fnname(mut self, rhs: Modint<C>) -> Modint<C> {
                 self $op rhs;
@@ -193,7 +218,12 @@ impl_arith_by_assign!(impl Rem::rem { use %=; });
 
 impl<C: ModintConst> One for Modint<C> {
     fn one() -> Modint<C> {
-        assert_ne!(C::MOD, 1, "one() is called for Modint with MOD = 1");
+        #[cfg(feature = "rust2020")]
+        let modulus = C::MOD;
+        #[cfg(feature = "rust2016")]
+        let modulus = C::get_modulus();
+
+        assert_ne!(modulus, 1, "one() is called for Modint with MOD = 1");
         unsafe { Modint::new_unchecked(1) }
     }
 }
@@ -226,6 +256,7 @@ impl<C> fmt::Display for Modint<C> {
     }
 }
 
+#[cfg(feature = "rust2020")]
 impl<C: ModintConst> Num for Modint<C> {
     type FromStrRadixErr = <ModintInnerType as Num>::FromStrRadixErr;
     fn from_str_radix(src: &str, radix: u32) -> Result<Self, Self::FromStrRadixErr> {
@@ -237,7 +268,7 @@ impl<C: ModintConst> Num for Modint<C> {
 mod tests {
     use super::*;
 
-    crate::define_modint_const! {
+    define_modint_const! {
         pub const MOD5 = 5;
     }
 
@@ -268,7 +299,7 @@ mod tests {
         assert_eq!(
             [M::new(1), M::new(2), M::new(3), M::new(4)]
                 .iter()
-                .copied()
+                .cloned()
                 .sum::<M>(),
             M::new(0)
         );
@@ -276,11 +307,12 @@ mod tests {
         assert_eq!(
             [M::new(1), M::new(2), M::new(3), M::new(4)]
                 .iter()
-                .copied()
+                .cloned()
                 .product::<M>(),
             M::new(4)
         );
 
+        #[cfg(feature = "rust2020")]
         assert_eq!(num::pow(a, 10), M::new(4));
     }
 }
