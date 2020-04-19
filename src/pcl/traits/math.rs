@@ -42,10 +42,6 @@ macro_rules! impl_group_for_primitives_using_add {
             }
 
             fn id() -> Self {
-                #[cfg(feature = "rust2020")]
-                use num::Zero;
-                #[cfg(feature = "rust2016")]
-                use pcl::polyfill::num::Zero;
                 <$ty as Zero>::zero()
             }
 
@@ -56,6 +52,14 @@ macro_rules! impl_group_for_primitives_using_add {
         )*
     };
 }
+
+// マクロ内で #[cfg(feature = ...)] を使ってしまうとそれは除去することができない
+// （マクロを展開する前の状態でパースするので）ため、バージョンで分けたい場合は
+// このように外で use しておく必要がある。
+#[cfg(feature = "rust2020")]
+use num::Zero;
+#[cfg(feature = "rust2016")]
+use pcl::polyfill::num::Zero;
 
 impl_group_for_primitives_using_add! { i8 i16 i32 i64 isize f32 f64 }
 
