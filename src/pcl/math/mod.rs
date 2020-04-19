@@ -1,5 +1,5 @@
-pub mod disjoint_set;
+pub mod disjoint_sets;
 pub mod modint;
 
-pub use self::disjoint_set::DisjointSet;
+pub use self::disjoint_sets::DisjointSets;
 pub use self::modint::{Modint, Modint17};

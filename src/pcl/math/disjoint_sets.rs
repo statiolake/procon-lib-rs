@@ -1,13 +1,13 @@
 use std::mem::swap;
 
-pub struct DisjointSet {
+pub struct DisjointSets {
     par: Vec<i64>,
     size: usize,
 }
 
-impl DisjointSet {
-    pub fn new(n: usize) -> DisjointSet {
-        DisjointSet {
+impl DisjointSets {
+    pub fn new(n: usize) -> DisjointSets {
+        DisjointSets {
             par: vec![-1; n],
             size: n,
         }
@@ -76,8 +76,8 @@ mod tests {
     use super::*;
 
     #[test]
-    fn disjoint_set() {
-        let mut uf = DisjointSet::new(5);
+    fn disjoint_sets() {
+        let mut uf = DisjointSets::new(5);
 
         assert_eq!(uf.size(), 5);
         assert!(!uf.in_same(0, 1));
