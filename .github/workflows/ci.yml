@@ -1,0 +1,86 @@
+name: Build
+on: [push, pull_request]
+jobs:
+  build:
+    strategy:
+      matrix:
+        toolchain:
+          - 1.42.0-x86_64-pc-windows-msvc
+          - 1.42.0-x86_64-pc-windows-gnu
+          - 1.42.0-x86_64-apple-darwin
+          - 1.42.0-x86_64-unknown-linux-gnu
+          - 1.15.0-x86_64-pc-windows-msvc
+          - 1.15.0-x86_64-pc-windows-gnu
+          - 1.15.0-x86_64-apple-darwin
+          - 1.15.0-x86_64-unknown-linux-gnu
+        include:
+          - toolchain: 1.42.0-x86_64-pc-windows-msvc
+            os: windows-latest
+            clippy: true
+            feature: rust2020
+          - toolchain: 1.42.0-x86_64-pc-windows-gnu
+            os: windows-latest
+            clippy: true
+            feature: rust2020
+          - toolchain: 1.42.0-x86_64-apple-darwin
+            os: macOS-latest
+            clippy: true
+            feature: rust2020
+          - toolchain: 1.42.0-x86_64-unknown-linux-gnu
+            os: ubuntu-latest
+            clippy: true
+            feature: rust2020
+          - toolchain: 1.15.0-x86_64-pc-windows-msvc
+            os: windows-latest
+            clippy: false
+            feature: rust2016
+          - toolchain: 1.15.0-x86_64-pc-windows-gnu
+            os: windows-latest
+            clippy: false
+            feature: rust2016
+          - toolchain: 1.15.0-x86_64-apple-darwin
+            os: macOS-latest
+            clippy: false
+            feature: rust2016
+          - toolchain: 1.15.0-x86_64-unknown-linux-gnu
+            os: ubuntu-latest
+            clippy: false
+            feature: rust2016
+    name: ${{ matrix.toolchain }}
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - name: '`git config --global core.autocrlf false`'
+        run: git config --global core.autocrlf false
+        if: matrix.os == 'windows-latest'
+
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Setup ${{ matrix.toolchain }}
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: ${{ matrix.toolchain }}
+          override: true
+          profile: default
+
+      - name: '`cargo clippy --all-targets --profile test -- -D warnings`'
+        if: matrix.clippy
+        uses: actions-rs/cargo@v1
+        with:
+          command: clippy
+          args: --all-targets --profile test -- -D warnings
+
+      - name: 'cargo test (2020)'
+        if: matrix.feature == 'rust2020'
+        uses: actions-rs/cargo@v1
+        with:
+          command: test
+          args: --no-default-features --features 'rust2020'
+
+      - name: 'cargo test (2016)'
+        if: matrix.feature == 'rust2016'
+        uses: actions-rs/cargo@v1
+        with:
+          command: test
+          args: --no-default-features --features 'rust2016'
