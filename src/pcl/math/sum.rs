@@ -1,4 +1,46 @@
 //! 区間の和を高速に計算する `CumSum`, `CumSum2D` を定義する。
+//!
+//! # `CumSum`
+//!
+//! 一次元の区間の和を高速に計算する。生成時に前処理として累積和をとる。
+//!
+//! ```
+//! # use procon_lib::pcl::math::CumSum;
+//! let cumsum = CumSum::from_array(&[5, 4, 1, 3, 2, 6]);
+//! assert_eq!(cumsum.sum(0..6), 21);
+//! # #[cfg(feature = "rust2020")]
+//! assert_eq!(cumsum.sum(0..=5), 21);
+//! assert_eq!(cumsum.sum(..6), 21);
+//! # #[cfg(feature = "rust2020")]
+//! assert_eq!(cumsum.sum(..=5), 21);
+//! assert_eq!(cumsum.sum(0..), 21);
+//! assert_eq!(cumsum.sum(..), 21);
+//! assert_eq!(cumsum.sum(1..2), 4);
+//! assert_eq!(cumsum.sum(1..5), 10);
+//! # #[cfg(feature = "rust2020")]
+//! assert_eq!(cumsum.sum(1..=1), 4);
+//! assert_eq!(cumsum.sum(1..0), 0);
+//! ```
+//!
+//!
+//! # `CumSum2D`
+//!
+//! 二次元の範囲の和を高速に計算する。生成時に前処理として累積和をとる。
+//!
+//! ```
+//! # use procon_lib::pcl::math::CumSum2D;
+//! let cumsum2d = CumSum2D::from_matrix(vec![
+//!     vec![4, 2, 3, 6, 1],
+//!     vec![5, 5, 2, 1, 4],
+//!     vec![1, 2, 3, 2, 2],
+//!     vec![3, 2, 1, 3, 2],
+//! ]);
+//! assert_eq!(cumsum2d.sum(0..2, 3..4), 7);
+//! assert_eq!(cumsum2d.sum(.., ..), 54);
+//! assert_eq!(cumsum2d.sum(1..3, 2..4), 8);
+//! assert_eq!(cumsum2d.sum(3..2, 3..4), 0);
+//! assert_eq!(cumsum2d.sum(1..2, 4..3), 0);
+//! ```
 
 use super::super::traits::Group;
 use std::cmp;
