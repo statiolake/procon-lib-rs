@@ -6,11 +6,13 @@ pub trait ModintConst {
 }
 
 // polyfill: use function instead
+#[macro_export]
 macro_rules! define_modint_const {
-    (pub const $name:ident = $value:expr;) => {
+    ($(#[doc = $doc:expr])* pub const $name:ident = $value:expr;) => {
+        $(#[doc = $doc])*
         pub enum $name {}
         impl $crate::pcl::math::modint::consts::ModintConst for $name {
-            fn get_modulus() -> ModintInnerType {
+            fn get_modulus() -> $crate::pcl::math::modint::ModintInnerType {
                 $value
             }
         }

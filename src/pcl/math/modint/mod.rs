@@ -1,3 +1,47 @@
+//! 常にある素数で割ったあまりになる整数型 [`Modint`](struct.Modint.html) を定義する。
+//!
+//! 中身の整数型は [`ModintInnerType`](type.ModintInnerType.html) で定められており、変更することを前
+//! 提としていない。ジェネリクスにしないのは、諸々の必要な条件を満たすのは結局ほぼプリミティブ整数し
+//! かなく、さらに実際 1e9+7 などの特有の法が使われることが多いために、ジェネリクスとして定義するほ
+//! どの意味がそもそもなくなっているからである。
+//!
+//! 実際に法を指定するときは、特別なトレイトを実装した型 (「定数」) を用意してジェネリクスとして
+//! `Modint` に与える。例えば定数 1e9+7 を表す型は `MOD17` である。それを使った`Modint<MOD17>` はよ
+//! く使われると考えられるので `Modint17` のエイリアスを用意している。
+//!
+//! 任意の定数を法に指定する方法を含めて、使い方は次の通りである。
+//!
+//! # Example
+//!
+//! ```
+//! # #[cfg(feature = "rust2016")]
+//! # #[macro_use]
+//! # extern crate procon_lib_rs;
+//! # #[cfg(feature = "rust2020")]
+//! # use procon_lib_rs::define_modint_const;
+//! # use procon_lib_rs::pcl::math::modint::Modint;
+//! #
+//! // rust2020 ではインポートが必要。
+//! // use crate::define_modint_const;
+//! define_modint_const! {
+//!     pub const MOD5 = 5;
+//! }
+//!
+//! type M5 = Modint<MOD5>;
+//!
+//! # fn main() {
+//! assert_eq!(M5::new(10), M5::new(0));
+//! assert_eq!(M5::new(3) + M5::new(4), M5::new(2));
+//! assert_eq!(M5::new(4) / M5::new(2), M5::new(2));
+//! assert_eq!(M5::new(3) / M5::new(2), M5::new(4));
+//! # }
+//! ```
+
+/// `Modint` の法になる定数を定めるマクロを提供する。
+///
+/// バージョン (rust2016, rust2020) によって異なるため別のモジュールに分けている。いずれの場合もトレ
+/// イト `ModintConst` を定義する型が定数として扱われるが、その値を rust2020 では関連定数 `MOD` で定
+/// 義していて、 rust2016 では `get_modulus()` で定義している。
 #[cfg(feature = "rust2020")]
 #[path = "consts_2020.rs"]
 #[macro_use]
@@ -21,29 +65,29 @@ use std::marker::PhantomData;
 use std::mem;
 use std::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Rem, RemAssign, Sub, SubAssign};
 
-/// `Modint` が扱う型。諸々の必要な条件を満たすのは結局ほぼプリミティブ整数しか
-/// なく、さらに実際 1e9+7 などの特有の法が使われることが多いため、ジェネリクス
-/// として定義するほどの意味がなくなっており、ジェネリクスにしないことにする。
+/// `Modint` が扱う内部型。
 pub type ModintInnerType = i64;
 
 define_modint_const! {
+    #[doc = "1e9+7 を表す定数。"]
     pub const MOD17 = 1_000_000_007;
 }
 
+/// 1e9+7 で割ったあまりを利用する `Modint` 。
 pub type Modint17 = Modint<MOD17>;
 
-/// 常に `C::MOD` で割ったあまりを計算する整数型。
+/// 常にある法 `C` で割ったあまりを計算する整数型。
 pub struct Modint<C> {
     value: ModintInnerType,
     marker: PhantomData<C>,
 }
 
 impl<C> Modint<C> {
-    /// チェックしないで新しい Modint を作成する。
+    /// チェックしないで新しい `Modint` を作成する。
     ///
     /// # Safety
     ///
-    /// - `0 <= value < C::MOD` を満たすこと。
+    /// - `0 <= value < C` を満たすこと。
     pub unsafe fn new_unchecked(value: ModintInnerType) -> Modint<C> {
         #[allow(unknown_lints, renamed_and_removed_lints, redundant_field_names)]
         Modint {
@@ -59,7 +103,7 @@ impl<C> Modint<C> {
 }
 
 impl<C: ModintConst> Modint<C> {
-    /// 新しい Modint を作成する。値は最初に丸められる。
+    /// 新しい `Modint` を作成する。値は最初に丸められる。
     pub fn new(mut value: ModintInnerType) -> Modint<C> {
         #[cfg(feature = "rust2020")]
         let modulus = C::MOD;
