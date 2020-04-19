@@ -19,11 +19,9 @@ impl<T: Group + Copy> CumSum<T> {
     /// O(n)
     pub fn from_array<A: AsRef<[T]>>(array: A) -> CumSum<T> {
         let array = array.as_ref();
-        let mut sum = vec![T::zero(); array.len() + 1];
+        let mut sum = vec![T::id(); array.len() + 1];
         for i in 1..=array.len() {
-            unsafe {
-                *sum.get_unchecked_mut(i) = *sum.get_unchecked(i - 1) + *array.get_unchecked(i - 1);
-            }
+            sum[i] = T::op(sum[i - 1], array[i - 1]);
         }
 
         CumSum { sum }
@@ -42,10 +40,10 @@ impl<T: Group + Copy> CumSum<T> {
         let end = range_end(&range, orig_len);
 
         if end <= start {
-            return T::zero();
+            return T::id();
         }
 
-        unsafe { *self.sum.get_unchecked(end) - *self.sum.get_unchecked(start) }
+        T::op(self.sum[end], T::inv(self.sum[start]))
     }
 }
 
@@ -71,28 +69,28 @@ impl<T: Group + Copy> CumSum2D<T> {
         let height = array.len();
         if height == 0 {
             return CumSum2D {
-                sum: vec![vec![T::zero()]],
+                sum: vec![vec![T::id()]],
             };
         }
 
-        let width = unsafe { array.get_unchecked(0) }.as_ref().len();
-        let mut sum = vec![vec![T::zero(); width + 1]; height + 1];
+        let width = array[0].as_ref().len();
+        let mut sum = vec![vec![T::id(); width + 1]; height + 1];
 
         for i in 1..=height {
             for j in 1..=width {
                 assert_eq!(
-                    unsafe { array.get_unchecked(i - 1) }.as_ref().len(),
+                    array[i - 1].as_ref().len(),
                     width,
                     "the array's length is differ line by line"
                 );
 
-                unsafe {
-                    *sum.get_unchecked_mut(i).get_unchecked_mut(j) =
-                        *sum.get_unchecked(i - 1).get_unchecked(j)
-                            + *sum.get_unchecked(i).get_unchecked(j - 1)
-                            - *sum.get_unchecked(i - 1).get_unchecked(j - 1)
-                            + *array.get_unchecked(i - 1).as_ref().get_unchecked(j - 1)
-                }
+                sum[i][j] = T::op(
+                    T::op(
+                        T::op(sum[i - 1][j], sum[i][j - 1]),
+                        T::inv(sum[i - 1][j - 1]),
+                    ),
+                    array[i - 1].as_ref()[j - 1],
+                )
             }
         }
 
@@ -120,15 +118,16 @@ impl<T: Group + Copy> CumSum2D<T> {
         let xend = range_end(&xrange, orig_width);
 
         if yend <= ystart || xend <= xstart {
-            return T::zero();
+            return T::id();
         }
 
-        unsafe {
-            *self.sum.get_unchecked(yend).get_unchecked(xend)
-                + *self.sum.get_unchecked(ystart).get_unchecked(xstart)
-                - *self.sum.get_unchecked(ystart).get_unchecked(xend)
-                - *self.sum.get_unchecked(yend).get_unchecked(xstart)
-        }
+        T::op(
+            T::op(
+                T::op(self.sum[yend][xend], self.sum[ystart][xstart]),
+                T::inv(self.sum[ystart][xend]),
+            ),
+            T::inv(self.sum[yend][xstart]),
+        )
     }
 }
 
