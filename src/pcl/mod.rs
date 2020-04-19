@@ -10,3 +10,4 @@ pub mod traits;
 
 pub mod macros;
 pub mod math;
+pub mod structure;
