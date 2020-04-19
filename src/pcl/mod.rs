@@ -8,4 +8,5 @@ pub mod sum;
 #[cfg(feature = "rust2020")]
 pub mod traits;
 
+pub mod macros;
 pub mod math;
