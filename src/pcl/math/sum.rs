@@ -1,14 +1,22 @@
+//! 区間の和を高速に計算する `CumSum`, `CumSum2D` を定義する。
+
 use crate::pcl::traits::Group;
 use std::cmp;
 use std::ops::{Bound, RangeBounds};
 
-/// ある数列の、指定された範囲の和を高速に計算します。
+/// ある数列の、指定された範囲の和を高速に計算する。
+///
+/// 実際は必ずしも通常の整数と和である必要はなく、群 (`Group`) であれば良い。
 pub struct CumSum<T> {
     sum: Vec<T>,
 }
 
 impl<T: Group + Copy> CumSum<T> {
-    /// 与えられた数列の累積和をとり、 `CumSum` を生成します。
+    /// 与えられた数列の累積和をとり、 `CumSum` を生成する。
+    ///
+    /// # 計算量
+    ///
+    /// O(n)
     pub fn from_array<A: AsRef<[T]>>(array: A) -> CumSum<T> {
         let array = array.as_ref();
         let mut sum = vec![T::zero(); array.len() + 1];
@@ -21,7 +29,11 @@ impl<T: Group + Copy> CumSum<T> {
         CumSum { sum }
     }
 
-    /// 指定された範囲内の総和を返します。
+    /// 指定された範囲内の総和を返す。
+    ///
+    /// # 計算量
+    ///
+    /// O(1)
     pub fn sum<R: RangeBounds<usize>>(&self, range: R) -> T {
         // 最初の配列の長さ
         let orig_len = self.sum.len() - 1;
@@ -37,13 +49,19 @@ impl<T: Group + Copy> CumSum<T> {
     }
 }
 
-// ある二次元数列の、指定された範囲の和を高速に計算します。
+/// ある二次元数列の、指定された範囲の和を高速に計算する。
+///
+/// 実際は必ずしも通常の整数と和である必要はなく、群 (`Group`) であれば良い。
 pub struct CumSum2D<T> {
     sum: Vec<Vec<T>>,
 }
 
 impl<T: Group + Copy> CumSum2D<T> {
-    /// 与えられた行列の累積和をとり、 `CumSum2D` を生成します。
+    /// 与えられた行列の累積和をとり、 `CumSum2D` を生成する。
+    ///
+    /// # 計算量
+    ///
+    /// n 行 m 列の行列に対し、 O(nm)
     pub fn from_matrix<M, A>(matrix: M) -> CumSum2D<T>
     where
         M: AsRef<[A]>,
@@ -81,7 +99,11 @@ impl<T: Group + Copy> CumSum2D<T> {
         CumSum2D { sum }
     }
 
-    /// 指定された範囲内の総和を返します。
+    /// 指定された範囲内の総和を返す。
+    ///
+    /// # 計算量
+    ///
+    /// O(1)
     pub fn sum<RY, RX>(&self, yrange: RY, xrange: RX) -> T
     where
         RY: RangeBounds<usize>,
