@@ -57,4 +57,7 @@ macro_rules! impl_group_for_primitives_using_add {
     };
 }
 
-impl_group_for_primitives_using_add! { i8 i16 i32 i64 i128 isize f32 f64 }
+impl_group_for_primitives_using_add! { i8 i16 i32 i64 isize f32 f64 }
+
+#[cfg(feature = "rust2020")]
+impl_group_for_primitives_using_add! { i128 }

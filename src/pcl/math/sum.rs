@@ -1,7 +1,11 @@
 //! 区間の和を高速に計算する `CumSum`, `CumSum2D` を定義する。
 
-use crate::pcl::traits::Group;
+use super::super::traits::Group;
 use std::cmp;
+
+#[cfg(feature = "rust2016")]
+use pcl::polyfill::std::ops::{Bound, RangeBounds};
+#[cfg(feature = "rust2020")]
 use std::ops::{Bound, RangeBounds};
 
 /// ある数列の、指定された範囲の和を高速に計算する。
@@ -20,11 +24,14 @@ impl<T: Group + Copy> CumSum<T> {
     pub fn from_array<A: AsRef<[T]>>(array: A) -> CumSum<T> {
         let array = array.as_ref();
         let mut sum = vec![T::id(); array.len() + 1];
-        for i in 1..=array.len() {
+        for i in 0..array.len() {
+            // to support rust2016
+            let i = i + 1;
             sum[i] = T::op(sum[i - 1], array[i - 1]);
         }
 
-        CumSum { sum }
+        #[allow(unknown_lints, renamed_and_removed_lints, redundant_field_names)]
+        CumSum { sum: sum }
     }
 
     /// 指定された範囲内の総和を返す。
@@ -76,8 +83,11 @@ impl<T: Group + Copy> CumSum2D<T> {
         let width = array[0].as_ref().len();
         let mut sum = vec![vec![T::id(); width + 1]; height + 1];
 
-        for i in 1..=height {
-            for j in 1..=width {
+        for i in 0..height {
+            // to support rust2016
+            let i = i + 1;
+            for j in 0..width {
+                let j = j + 1;
                 assert_eq!(
                     array[i - 1].as_ref().len(),
                     width,
@@ -94,7 +104,8 @@ impl<T: Group + Copy> CumSum2D<T> {
             }
         }
 
-        CumSum2D { sum }
+        #[allow(unknown_lints, renamed_and_removed_lints, redundant_field_names)]
+        CumSum2D { sum: sum }
     }
 
     /// 指定された範囲内の総和を返す。
@@ -158,11 +169,13 @@ mod tests {
     #[test]
     fn check_bounds() {
         assert_eq!(range_start(&(0..1), 0), 0);
+        #[cfg(feature = "rust2020")]
         assert_eq!(range_start(&(0..=1), 0), 0);
         assert_eq!(range_start(&(..1), 0), 0);
         assert_eq!(range_start(&(0..), 0), 0);
         assert_eq!(range_start(&(..), 0), 0);
         assert_eq!(range_end(&(0..1), 1), 1);
+        #[cfg(feature = "rust2020")]
         assert_eq!(range_end(&(0..=1), 1), 1);
         assert_eq!(range_end(&(..1), 1), 1);
         assert_eq!(range_end(&(0..), 1), 1);
@@ -173,13 +186,16 @@ mod tests {
     fn check_cumsum() {
         let cumsum = CumSum::from_array(&[5, 4, 1, 3, 2, 6]);
         assert_eq!(cumsum.sum(0..6), 21);
+        #[cfg(feature = "rust2020")]
         assert_eq!(cumsum.sum(0..=5), 21);
         assert_eq!(cumsum.sum(..6), 21);
+        #[cfg(feature = "rust2020")]
         assert_eq!(cumsum.sum(..=5), 21);
         assert_eq!(cumsum.sum(0..), 21);
         assert_eq!(cumsum.sum(..), 21);
         assert_eq!(cumsum.sum(1..2), 4);
         assert_eq!(cumsum.sum(1..5), 10);
+        #[cfg(feature = "rust2020")]
         assert_eq!(cumsum.sum(1..=1), 4);
         assert_eq!(cumsum.sum(1..0), 0);
     }
