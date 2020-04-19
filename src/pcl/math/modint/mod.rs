@@ -10,7 +10,7 @@ pub mod consts;
 #[cfg(feature = "rust2020")]
 use num::{Num, One, Zero};
 #[cfg(feature = "rust2016")]
-use pcl::polyfil::num::{One, Zero};
+use pcl::polyfill::num::{One, Zero};
 
 use self::consts::ModintConst;
 use std::cmp::Ordering;

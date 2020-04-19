@@ -1,11 +1,11 @@
 use super::ModintInnerType;
 
-// polyfil: return value from function
+// polyfill: return value from function
 pub trait ModintConst {
     fn get_modulus() -> ModintInnerType;
 }
 
-// polyfil: use function instead
+// polyfill: use function instead
 macro_rules! define_modint_const {
     (pub const $name:ident = $value:expr;) => {
         pub enum $name {}
