@@ -4,7 +4,7 @@
 //! 二つの要素が同じ集合に属しているかどうかの判定を高速に行える。
 //!
 //! ```
-//! # use procon_lib_rs::pcl::math::DisjointSets;
+//! # use procon_lib::pcl::math::DisjointSets;
 //! let mut uf = DisjointSets::new(5);
 //!
 //! assert_eq!(uf.size(), 5);

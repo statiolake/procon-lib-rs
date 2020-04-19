@@ -16,10 +16,10 @@
 //! ```
 //! # #[cfg(feature = "rust2016")]
 //! # #[macro_use]
-//! # extern crate procon_lib_rs;
+//! # extern crate procon_lib;
 //! # #[cfg(feature = "rust2020")]
-//! # use procon_lib_rs::define_modint_const;
-//! # use procon_lib_rs::pcl::math::modint::Modint;
+//! # use procon_lib::define_modint_const;
+//! # use procon_lib::pcl::math::modint::Modint;
 //! #
 //! // rust2020 ではインポートが必要。
 //! // use crate::define_modint_const;
