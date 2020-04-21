@@ -57,13 +57,16 @@ use num::{Num, One, Zero};
 use pcl::polyfill::num::{One, Zero};
 
 use self::consts::ModintConst;
+use super::super::traits::math::Group;
 use std::cmp::Ordering;
 use std::fmt;
 use std::hash::{Hash, Hasher};
 use std::iter::{Product, Sum};
 use std::marker::PhantomData;
 use std::mem;
-use std::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Rem, RemAssign, Sub, SubAssign};
+use std::ops::{
+    Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Rem, RemAssign, Sub, SubAssign,
+};
 
 /// `Modint` が扱う内部型。
 pub type ModintInnerType = i64;
@@ -242,6 +245,13 @@ impl<C: ModintConst> RemAssign for Modint<C> {
     }
 }
 
+impl<C: ModintConst> Neg for Modint<C> {
+    type Output = Self;
+    fn neg(self) -> Self {
+        Self::zero() - self
+    }
+}
+
 macro_rules! impl_arith_by_assign {
     (impl $traitname:ident::$fnname:ident { use $op:tt; }) => {
         impl<C: ModintConst> $traitname for Modint<C> {
@@ -308,8 +318,23 @@ impl<C: ModintConst> Num for Modint<C> {
     }
 }
 
+impl<C: ModintConst> Group for Modint<C> {
+    fn op(x: Self, y: Self) -> Self {
+        x + y
+    }
+
+    fn id() -> Self {
+        Self::zero()
+    }
+
+    fn inv(x: Self) -> Self {
+        -x
+    }
+}
+
 #[cfg(test)]
 mod tests {
+    use super::super::CumSum;
     use super::*;
 
     define_modint_const! {
@@ -358,5 +383,9 @@ mod tests {
 
         #[cfg(feature = "rust2020")]
         assert_eq!(num::pow(a, 10), M::new(4));
+
+        let cs = CumSum::from_array(vec![M::new(3), M::new(4), M::new(2)]);
+        assert_eq!(cs.sum(1..), M::new(1));
+        assert_eq!(cs.sum(..2), M::new(2));
     }
 }
