@@ -2,6 +2,28 @@ use std::io::prelude::*;
 use std::io::stdin;
 use std::str::FromStr;
 
+#[macro_export]
+macro_rules! eprint {
+    ($($args:tt)*) => {
+        <::std::io::Stderr as ::std::io::Write>::write_fmt(
+            &mut ::std::io::stderr(), format_args!($($args)*)
+        ).unwrap();
+    };
+}
+
+#[macro_export]
+macro_rules! eprintln {
+    () => {
+        eprint!("\n");
+    };
+    ($fmt:expr) => {
+        eprint!(concat!($fmt, "\n"));
+    };
+    ($fmt:expr, $($args:tt)*) => {
+        eprint!(concat!($fmt, "\n"), $($args)*);
+    };
+}
+
 pub fn read_line() -> String {
     let mut s = String::new();
     stdin().read_line(&mut s).unwrap();
@@ -46,6 +68,17 @@ pub fn read_ascii_from<R: Read>(read: R) -> char {
 mod tests {
     use super::*;
     use std::io::Cursor;
+
+    #[test]
+    fn eprintln() {
+        eprint!("hello, ");
+        eprint!("world!");
+        eprintln!();
+        eprintln!("hello, world!");
+        eprintln!("this is a test: {}", 3);
+        let world = "world";
+        eprintln!("hello, {}", world);
+    }
 
     #[test]
     fn read() {
