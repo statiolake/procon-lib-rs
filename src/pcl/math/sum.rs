@@ -57,6 +57,7 @@ pub struct CumSum<T> {
     sum: Vec<T>,
 }
 
+#[allow(unknown_lints, renamed_and_removed_lints, len_without_is_empty)]
 impl<T: Group + Copy> CumSum<T> {
     /// 与えられた数列の累積和をとり、 `CumSum` を生成する。
     ///
@@ -93,6 +94,15 @@ impl<T: Group + Copy> CumSum<T> {
         }
 
         T::op(self.sum[end], T::inv(self.sum[start]))
+    }
+
+    /// もとの配列の長さを取得する。
+    ///
+    /// # 計算量
+    ///
+    /// O(1)
+    pub fn len(&self) -> usize {
+        self.sum.len() - 1
     }
 }
 
@@ -182,6 +192,17 @@ impl<T: Group + Copy> CumSum2D<T> {
             T::inv(self.sum[yend][xstart]),
         )
     }
+
+    /// もとの行列の長さを取得する。
+    ///
+    /// 戻り値は (高さ, 幅)
+    ///
+    /// # 計算量
+    ///
+    /// O(1)
+    pub fn size(&self) -> (usize, usize) {
+        (self.sum.len() - 1, self.sum[0].len() - 1)
+    }
 }
 
 fn range_start<R: RangeBounds<usize>>(range: &R, min: usize) -> usize {
@@ -240,6 +261,8 @@ mod tests {
         #[cfg(feature = "rust2020")]
         assert_eq!(cumsum.sum(1..=1), 4);
         assert_eq!(cumsum.sum(1..0), 0);
+
+        assert_eq!(cumsum.len(), 6);
     }
 
     #[test]
@@ -255,5 +278,7 @@ mod tests {
         assert_eq!(cumsum2d.sum(1..3, 2..4), 8);
         assert_eq!(cumsum2d.sum(3..2, 3..4), 0);
         assert_eq!(cumsum2d.sum(1..2, 4..3), 0);
+
+        assert_eq!(cumsum2d.size(), (4, 5));
     }
 }
