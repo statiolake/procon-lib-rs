@@ -21,9 +21,9 @@
 //! assert_eq!(st.query(1..3).0, 2);
 //! ```
 
+use super::super::compat::std::ops::RangeBounds;
 use super::super::traits::math::Monoid;
 use super::super::utils::range;
-use super::super::utils::range::RangeBounds;
 use std::fmt;
 
 /// セグメント木。

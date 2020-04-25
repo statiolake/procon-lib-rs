@@ -52,11 +52,10 @@ pub mod consts;
 pub mod consts;
 
 #[cfg(feature = "rust2020")]
-use num::{Num, One, Zero};
-#[cfg(feature = "rust2016")]
-use pcl::polyfill::num::{One, Zero};
+use num::Num;
 
 use self::consts::ModintConst;
+use super::super::compat::num::{One, Zero};
 use std::cmp::Ordering;
 use std::fmt;
 use std::hash::{Hash, Hasher};

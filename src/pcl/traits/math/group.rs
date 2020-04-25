@@ -14,10 +14,7 @@ pub trait Group: Monoid {
     fn inv(x: Self) -> Self;
 }
 
-#[cfg(feature = "rust2020")]
-use num::Zero;
-#[cfg(feature = "rust2016")]
-use pcl::polyfill::num::Zero;
+use super::super::super::compat::num::Zero;
 
 use std::ops::{Add, Neg};
 

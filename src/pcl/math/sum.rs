@@ -46,9 +46,9 @@
 //! assert_eq!(cumsum2d.sum(1..2, 4..3).0, 0);
 //! ```
 
+use super::super::compat::std::ops::RangeBounds;
 use super::super::traits::Group;
 use super::super::utils::range;
-use super::super::utils::range::RangeBounds;
 
 /// ある数列の、指定された範囲の和を高速に計算する。
 ///
