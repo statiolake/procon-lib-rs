@@ -57,7 +57,6 @@ use num::{Num, One, Zero};
 use pcl::polyfill::num::{One, Zero};
 
 use self::consts::ModintConst;
-use super::super::traits::math::Group;
 use std::cmp::Ordering;
 use std::fmt;
 use std::hash::{Hash, Hasher};
@@ -318,22 +317,9 @@ impl<C: ModintConst> Num for Modint<C> {
     }
 }
 
-impl<C: ModintConst> Group for Modint<C> {
-    fn op(x: Self, y: Self) -> Self {
-        x + y
-    }
-
-    fn id() -> Self {
-        Self::zero()
-    }
-
-    fn inv(x: Self) -> Self {
-        -x
-    }
-}
-
 #[cfg(test)]
 mod tests {
+    use super::super::super::traits::math::group::Additive as A;
     use super::super::CumSum;
     use super::*;
 
@@ -384,8 +370,8 @@ mod tests {
         #[cfg(feature = "rust2020")]
         assert_eq!(num::pow(a, 10), M::new(4));
 
-        let cs = CumSum::from_array(vec![M::new(3), M::new(4), M::new(2)]);
-        assert_eq!(cs.sum(1..), M::new(1));
-        assert_eq!(cs.sum(..2), M::new(2));
+        let cs = CumSum::from_array(vec![A(M::new(3)), A(M::new(4)), A(M::new(2))]);
+        assert_eq!(cs.sum(1..).0, M::new(1));
+        assert_eq!(cs.sum(..2).0, M::new(2));
     }
 }

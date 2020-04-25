@@ -6,20 +6,22 @@
 //!
 //! ```
 //! # use procon_lib::pcl::math::CumSum;
-//! let cumsum = CumSum::from_array(&[5, 4, 1, 3, 2, 6]);
-//! assert_eq!(cumsum.sum(0..6), 21);
+//! # use procon_lib::pcl::traits::math::group::Additive as A;
+//! // use crate::pcl::math::group::Additive as A;
+//! let cumsum = CumSum::from_array(&[A(5), A(4), A(1), A(3), A(2), A(6)]);
+//! assert_eq!(cumsum.sum(0..6).0, 21);
 //! # #[cfg(feature = "rust2020")]
-//! assert_eq!(cumsum.sum(0..=5), 21);
-//! assert_eq!(cumsum.sum(..6), 21);
+//! assert_eq!(cumsum.sum(0..=5).0, 21);
+//! assert_eq!(cumsum.sum(..6).0, 21);
 //! # #[cfg(feature = "rust2020")]
-//! assert_eq!(cumsum.sum(..=5), 21);
-//! assert_eq!(cumsum.sum(0..), 21);
-//! assert_eq!(cumsum.sum(..), 21);
-//! assert_eq!(cumsum.sum(1..2), 4);
-//! assert_eq!(cumsum.sum(1..5), 10);
+//! assert_eq!(cumsum.sum(..=5).0, 21);
+//! assert_eq!(cumsum.sum(0..).0, 21);
+//! assert_eq!(cumsum.sum(..).0, 21);
+//! assert_eq!(cumsum.sum(1..2).0, 4);
+//! assert_eq!(cumsum.sum(1..5).0, 10);
 //! # #[cfg(feature = "rust2020")]
-//! assert_eq!(cumsum.sum(1..=1), 4);
-//! assert_eq!(cumsum.sum(1..0), 0);
+//! assert_eq!(cumsum.sum(1..=1).0, 4);
+//! assert_eq!(cumsum.sum(1..0).0, 0);
 //! ```
 //!
 //!
@@ -29,17 +31,19 @@
 //!
 //! ```
 //! # use procon_lib::pcl::math::CumSum2D;
+//! # use procon_lib::pcl::traits::math::group::Additive as A;
+//! // use crate::pcl::math::group::Additive as A;
 //! let cumsum2d = CumSum2D::from_matrix(vec![
-//!     vec![4, 2, 3, 6, 1],
-//!     vec![5, 5, 2, 1, 4],
-//!     vec![1, 2, 3, 2, 2],
-//!     vec![3, 2, 1, 3, 2],
+//!     vec![A(4), A(2), A(3), A(6), A(1)],
+//!     vec![A(5), A(5), A(2), A(1), A(4)],
+//!     vec![A(1), A(2), A(3), A(2), A(2)],
+//!     vec![A(3), A(2), A(1), A(3), A(2)],
 //! ]);
-//! assert_eq!(cumsum2d.sum(0..2, 3..4), 7);
-//! assert_eq!(cumsum2d.sum(.., ..), 54);
-//! assert_eq!(cumsum2d.sum(1..3, 2..4), 8);
-//! assert_eq!(cumsum2d.sum(3..2, 3..4), 0);
-//! assert_eq!(cumsum2d.sum(1..2, 4..3), 0);
+//! assert_eq!(cumsum2d.sum(0..2, 3..4).0, 7);
+//! assert_eq!(cumsum2d.sum(.., ..).0, 54);
+//! assert_eq!(cumsum2d.sum(1..3, 2..4).0, 8);
+//! assert_eq!(cumsum2d.sum(3..2, 3..4).0, 0);
+//! assert_eq!(cumsum2d.sum(1..2, 4..3).0, 0);
 //! ```
 
 use super::super::traits::Group;
@@ -54,7 +58,7 @@ use std::ops::{Bound, RangeBounds};
 ///
 /// 実際は必ずしも通常の整数と和である必要はなく、群 (`Group`) であれば良い。
 pub struct CumSum<T> {
-    sum: Vec<T>,
+    psum: Vec<T>,
 }
 
 #[allow(unknown_lints, renamed_and_removed_lints, len_without_is_empty)]
@@ -66,15 +70,15 @@ impl<T: Group + Copy> CumSum<T> {
     /// O(n)
     pub fn from_array<A: AsRef<[T]>>(array: A) -> CumSum<T> {
         let array = array.as_ref();
-        let mut sum = vec![T::id(); array.len() + 1];
+        let mut psum = vec![T::id(); array.len() + 1];
         for i in 0..array.len() {
             // to support rust2016
             let i = i + 1;
-            sum[i] = T::op(sum[i - 1], array[i - 1]);
+            psum[i] = T::op(psum[i - 1], array[i - 1]);
         }
 
         #[allow(unknown_lints, renamed_and_removed_lints, redundant_field_names)]
-        CumSum { sum: sum }
+        CumSum { psum: psum }
     }
 
     /// 指定された範囲内の総和を返す。
@@ -84,7 +88,7 @@ impl<T: Group + Copy> CumSum<T> {
     /// O(1)
     pub fn sum<R: RangeBounds<usize>>(&self, range: R) -> T {
         // 最初の配列の長さ
-        let orig_len = self.sum.len() - 1;
+        let orig_len = self.psum.len() - 1;
 
         let start = range_start(&range, 0);
         let end = range_end(&range, orig_len);
@@ -93,7 +97,7 @@ impl<T: Group + Copy> CumSum<T> {
             return T::id();
         }
 
-        T::op(self.sum[end], T::inv(self.sum[start]))
+        T::op(self.psum[end], T::inv(self.psum[start]))
     }
 
     /// もとの配列の長さを取得する。
@@ -102,7 +106,7 @@ impl<T: Group + Copy> CumSum<T> {
     ///
     /// O(1)
     pub fn len(&self) -> usize {
-        self.sum.len() - 1
+        self.psum.len() - 1
     }
 }
 
@@ -110,7 +114,7 @@ impl<T: Group + Copy> CumSum<T> {
 ///
 /// 実際は必ずしも通常の整数と和である必要はなく、群 (`Group`) であれば良い。
 pub struct CumSum2D<T> {
-    sum: Vec<Vec<T>>,
+    psum: Vec<Vec<T>>,
 }
 
 impl<T: Group + Copy> CumSum2D<T> {
@@ -128,12 +132,12 @@ impl<T: Group + Copy> CumSum2D<T> {
         let height = array.len();
         if height == 0 {
             return CumSum2D {
-                sum: vec![vec![T::id()]],
+                psum: vec![vec![T::id()]],
             };
         }
 
         let width = array[0].as_ref().len();
-        let mut sum = vec![vec![T::id(); width + 1]; height + 1];
+        let mut psum = vec![vec![T::id(); width + 1]; height + 1];
 
         for i in 0..height {
             // to support rust2016
@@ -146,10 +150,10 @@ impl<T: Group + Copy> CumSum2D<T> {
                     "the array's length is differ line by line"
                 );
 
-                sum[i][j] = T::op(
+                psum[i][j] = T::op(
                     T::op(
-                        T::op(sum[i - 1][j], sum[i][j - 1]),
-                        T::inv(sum[i - 1][j - 1]),
+                        T::op(psum[i - 1][j], psum[i][j - 1]),
+                        T::inv(psum[i - 1][j - 1]),
                     ),
                     array[i - 1].as_ref()[j - 1],
                 )
@@ -157,7 +161,7 @@ impl<T: Group + Copy> CumSum2D<T> {
         }
 
         #[allow(unknown_lints, renamed_and_removed_lints, redundant_field_names)]
-        CumSum2D { sum: sum }
+        CumSum2D { psum: psum }
     }
 
     /// 指定された範囲内の総和を返す。
@@ -171,9 +175,9 @@ impl<T: Group + Copy> CumSum2D<T> {
         RX: RangeBounds<usize>,
     {
         // 最初の配列の長さ
-        let orig_height = self.sum.len() - 1;
-        // safety: self.sum は必ず要素を一つは含む (`vec![vec![0]]` が最小)
-        let orig_width = unsafe { self.sum.get_unchecked(0).len() } - 1;
+        let orig_height = self.psum.len() - 1;
+        // safety: self.psum は必ず要素を一つは含む (`vec![vec![0]]` が最小)
+        let orig_width = unsafe { self.psum.get_unchecked(0).len() } - 1;
 
         let ystart = range_start(&yrange, 0);
         let yend = range_end(&yrange, orig_height);
@@ -186,10 +190,10 @@ impl<T: Group + Copy> CumSum2D<T> {
 
         T::op(
             T::op(
-                T::op(self.sum[yend][xend], self.sum[ystart][xstart]),
-                T::inv(self.sum[ystart][xend]),
+                T::op(self.psum[yend][xend], self.psum[ystart][xstart]),
+                T::inv(self.psum[ystart][xend]),
             ),
-            T::inv(self.sum[yend][xstart]),
+            T::inv(self.psum[yend][xstart]),
         )
     }
 
@@ -201,7 +205,7 @@ impl<T: Group + Copy> CumSum2D<T> {
     ///
     /// O(1)
     pub fn size(&self) -> (usize, usize) {
-        (self.sum.len() - 1, self.sum[0].len() - 1)
+        (self.psum.len() - 1, self.psum[0].len() - 1)
     }
 }
 
@@ -227,6 +231,7 @@ fn range_end<R: RangeBounds<usize>>(range: &R, max: usize) -> usize {
 
 #[cfg(test)]
 mod tests {
+    use super::super::super::traits::math::group::Additive as A;
     use super::*;
 
     #[test]
@@ -247,20 +252,20 @@ mod tests {
 
     #[test]
     fn check_cumsum() {
-        let cumsum = CumSum::from_array(&[5, 4, 1, 3, 2, 6]);
-        assert_eq!(cumsum.sum(0..6), 21);
+        let cumsum = CumSum::from_array(&[A(5), A(4), A(1), A(3), A(2), A(6)]);
+        assert_eq!(cumsum.sum(0..6).0, 21);
         #[cfg(feature = "rust2020")]
-        assert_eq!(cumsum.sum(0..=5), 21);
-        assert_eq!(cumsum.sum(..6), 21);
+        assert_eq!(cumsum.sum(0..=5).0, 21);
+        assert_eq!(cumsum.sum(..6).0, 21);
         #[cfg(feature = "rust2020")]
-        assert_eq!(cumsum.sum(..=5), 21);
-        assert_eq!(cumsum.sum(0..), 21);
-        assert_eq!(cumsum.sum(..), 21);
-        assert_eq!(cumsum.sum(1..2), 4);
-        assert_eq!(cumsum.sum(1..5), 10);
+        assert_eq!(cumsum.sum(..=5).0, 21);
+        assert_eq!(cumsum.sum(0..).0, 21);
+        assert_eq!(cumsum.sum(..).0, 21);
+        assert_eq!(cumsum.sum(1..2).0, 4);
+        assert_eq!(cumsum.sum(1..5).0, 10);
         #[cfg(feature = "rust2020")]
-        assert_eq!(cumsum.sum(1..=1), 4);
-        assert_eq!(cumsum.sum(1..0), 0);
+        assert_eq!(cumsum.sum(1..=1).0, 4);
+        assert_eq!(cumsum.sum(1..0).0, 0);
 
         assert_eq!(cumsum.len(), 6);
     }
@@ -268,16 +273,16 @@ mod tests {
     #[test]
     fn check_cumsum2d() {
         let cumsum2d = CumSum2D::from_matrix(vec![
-            vec![4, 2, 3, 6, 1],
-            vec![5, 5, 2, 1, 4],
-            vec![1, 2, 3, 2, 2],
-            vec![3, 2, 1, 3, 2],
+            vec![A(4), A(2), A(3), A(6), A(1)],
+            vec![A(5), A(5), A(2), A(1), A(4)],
+            vec![A(1), A(2), A(3), A(2), A(2)],
+            vec![A(3), A(2), A(1), A(3), A(2)],
         ]);
-        assert_eq!(cumsum2d.sum(0..2, 3..4), 7);
-        assert_eq!(cumsum2d.sum(.., ..), 54);
-        assert_eq!(cumsum2d.sum(1..3, 2..4), 8);
-        assert_eq!(cumsum2d.sum(3..2, 3..4), 0);
-        assert_eq!(cumsum2d.sum(1..2, 4..3), 0);
+        assert_eq!(cumsum2d.sum(0..2, 3..4).0, 7);
+        assert_eq!(cumsum2d.sum(.., ..).0, 54);
+        assert_eq!(cumsum2d.sum(1..3, 2..4).0, 8);
+        assert_eq!(cumsum2d.sum(3..2, 3..4).0, 0);
+        assert_eq!(cumsum2d.sum(1..2, 4..3).0, 0);
 
         assert_eq!(cumsum2d.size(), (4, 5));
     }
