@@ -47,12 +47,8 @@
 //! ```
 
 use super::super::traits::Group;
-use std::cmp;
-
-#[cfg(feature = "rust2016")]
-use pcl::polyfill::std::ops::{Bound, RangeBounds};
-#[cfg(feature = "rust2020")]
-use std::ops::{Bound, RangeBounds};
+use super::super::utils::range;
+use super::super::utils::range::RangeBounds;
 
 /// ある数列の、指定された範囲の和を高速に計算する。
 ///
@@ -90,8 +86,8 @@ impl<T: Group + Copy> CumSum<T> {
         // 最初の配列の長さ
         let orig_len = self.psum.len() - 1;
 
-        let start = range_start(&range, 0);
-        let end = range_end(&range, orig_len);
+        let start = range::range_start(&range, 0);
+        let end = range::range_end(&range, orig_len);
 
         if end <= start {
             return T::id();
@@ -179,10 +175,10 @@ impl<T: Group + Copy> CumSum2D<T> {
         // safety: self.psum は必ず要素を一つは含む (`vec![vec![0]]` が最小)
         let orig_width = unsafe { self.psum.get_unchecked(0).len() } - 1;
 
-        let ystart = range_start(&yrange, 0);
-        let yend = range_end(&yrange, orig_height);
-        let xstart = range_start(&xrange, 0);
-        let xend = range_end(&xrange, orig_width);
+        let ystart = range::range_start(&yrange, 0);
+        let yend = range::range_end(&yrange, orig_height);
+        let xstart = range::range_start(&xrange, 0);
+        let xend = range::range_end(&xrange, orig_width);
 
         if yend <= ystart || xend <= xstart {
             return T::id();
@@ -209,46 +205,10 @@ impl<T: Group + Copy> CumSum2D<T> {
     }
 }
 
-fn range_start<R: RangeBounds<usize>>(range: &R, min: usize) -> usize {
-    let start = match range.start_bound() {
-        Bound::Included(&x) => x,
-        Bound::Excluded(&x) => x + 1,
-        Bound::Unbounded => 0,
-    };
-
-    cmp::max(start, min)
-}
-
-fn range_end<R: RangeBounds<usize>>(range: &R, max: usize) -> usize {
-    let end = match range.end_bound() {
-        Bound::Included(&x) => x + 1,
-        Bound::Excluded(&x) => x,
-        Bound::Unbounded => max,
-    };
-
-    cmp::min(end, max)
-}
-
 #[cfg(test)]
 mod tests {
     use super::super::super::traits::math::group::Additive as A;
     use super::*;
-
-    #[test]
-    fn check_bounds() {
-        assert_eq!(range_start(&(0..1), 0), 0);
-        #[cfg(feature = "rust2020")]
-        assert_eq!(range_start(&(0..=1), 0), 0);
-        assert_eq!(range_start(&(..1), 0), 0);
-        assert_eq!(range_start(&(0..), 0), 0);
-        assert_eq!(range_start(&(..), 0), 0);
-        assert_eq!(range_end(&(0..1), 1), 1);
-        #[cfg(feature = "rust2020")]
-        assert_eq!(range_end(&(0..=1), 1), 1);
-        assert_eq!(range_end(&(..1), 1), 1);
-        assert_eq!(range_end(&(0..), 1), 1);
-        assert_eq!(range_end(&(..), 1), 1);
-    }
 
     #[test]
     fn check_cumsum() {
