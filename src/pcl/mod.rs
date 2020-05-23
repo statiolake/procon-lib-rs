@@ -7,6 +7,7 @@ pub mod polyfill;
 pub mod compat;
 pub mod macros;
 pub mod math;
+pub mod prelude;
 pub mod structure;
 pub mod traits;
 pub mod utils;
