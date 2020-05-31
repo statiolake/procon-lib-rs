@@ -24,6 +24,32 @@ macro_rules! eprintln {
     };
 }
 
+#[macro_export]
+macro_rules! dbg {
+    () => {
+        eprintln!("[{}:{}]", file!(), line!());
+    };
+    ($var:expr) => {{
+        eprintln!(
+            concat!("[{}:{}] ", stringify!($var), " = {}"),
+            file!(),
+            line!(),
+            $var
+        );
+        $var
+    }};
+    ($var:expr, $($vars:expr),*) => {{
+        eprintln!(
+            concat!("[{}:{}] ", stringify!($var), " = {}", $(", ", stringify!($vars), " = {}"),*),
+            file!(),
+            line!(),
+            $var,
+            $($vars),*
+        );
+        ($var, $($vars),*)
+    }};
+}
+
 pub fn read_line() -> String {
     let mut s = String::new();
     stdin().read_line(&mut s).unwrap();
@@ -78,6 +104,19 @@ mod tests {
         eprintln!("this is a test: {}", 3);
         let world = "world";
         eprintln!("hello, {}", world);
+    }
+
+    #[test]
+    fn dbg() {
+        let x = 3;
+        let y = "hello".to_string();
+        dbg!();
+        dbg!(x);
+        dbg!(x, &y);
+        let z = dbg!(x);
+        dbg!(z);
+        let (a, b) = dbg!(x, y);
+        dbg!(a, b);
     }
 
     #[test]
