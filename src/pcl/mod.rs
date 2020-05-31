@@ -2,6 +2,7 @@
 //!
 //! 実際の提出用プロジェクトでは、このディレクトリをクレート直下に配置することを想定している。
 #[cfg(feature = "rust2016")]
+#[macro_use]
 pub mod polyfill;
 
 pub mod compat;
