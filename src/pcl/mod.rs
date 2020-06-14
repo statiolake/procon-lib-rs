@@ -5,6 +5,7 @@
 #[macro_use]
 pub mod polyfill;
 
+pub mod collections;
 pub mod compat;
 pub mod macros;
 pub mod math;
