@@ -39,14 +39,14 @@ where
     /// スライスから Counter を生成する。得られる Counter は deref されたものになる。これは
     /// &[&String] から &str のカウンタを作るときなどに便利。
     pub fn from_slice_deref(slice: &[T]) -> Counter<&<T as Deref>::Target> {
-        Counter::from_iter(slice.iter().map(|x| &**x))
+        slice.iter().map(|x| &**x).collect()
     }
 }
 
 impl<T: Eq + Hash> Counter<T> {
     /// スライスから Counter を生成する。
     pub fn from_slice(slice: &[T]) -> Counter<&T> {
-        Counter::from_iter(slice.iter())
+        slice.iter().collect()
     }
 
     /// 特定の要素の個数を取得する。
