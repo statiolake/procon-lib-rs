@@ -5,7 +5,7 @@
 //! # Example
 //!
 //! ```
-//! # #[cfg(feature = "rust2016")]
+//! # #[cfg(not(feature = "rust-131"))]
 //! # extern crate procon_lib;
 //! # use procon_lib::pcl::collections::counter::Counter;
 //! #

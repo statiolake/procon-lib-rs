@@ -10,9 +10,9 @@ pub trait ModintConst {
 /// # Examples
 ///
 /// ```
-/// # #[cfg(feature = "rust2016")]
+/// # #[cfg(not(feature = "rust-131"))]
 /// # #[macro_use] extern crate procon_lib;
-/// # #[cfg(feature = "rust2020")]
+/// # #[cfg(feature = "rust-131")]
 /// # use procon_lib::define_modint_const;
 /// // use crate::define_modint_const;
 /// define_modint_const! {

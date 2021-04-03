@@ -147,7 +147,7 @@ mod tests {
         st.update(2, Min(3));
         println!("{:?}", st);
         assert_eq!(st.query(0..3).0, 1);
-        #[cfg(feature = "rust2020")]
+        #[cfg(feature = "rust-131")]
         assert_eq!(st.query(0..=2).0, 1);
         assert_eq!(st.query(1..3).0, 2);
     }

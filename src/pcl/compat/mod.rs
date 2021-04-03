@@ -1,20 +1,17 @@
-//! rust2016 と rust2020 の差を吸収するレイヤー。
-//!
-//! polyfill は rust2016 向けに機能を提供するモジュールで、ここは rust2016 と
-//! rust2020 の間で主に `use` が煩雑にならないように共通化するレイヤー。
+//! バージョン違いの差異を吸収するレイヤー。
 
 pub mod std {
     pub mod ops {
-        #[cfg(feature = "rust2016")]
+        #[cfg(not(feature = "rust-131"))]
         pub use pcl::polyfill::std::ops::{Bound, RangeBounds};
-        #[cfg(feature = "rust2020")]
+        #[cfg(feature = "rust-131")]
         pub use std::ops::{Bound, RangeBounds};
     }
 }
 
 pub mod num {
-    #[cfg(feature = "rust2020")]
+    #[cfg(feature = "crates-atc-2020")]
     pub use num::{One, Zero};
-    #[cfg(feature = "rust2016")]
+    #[cfg(not(feature = "crates-atc-2020"))]
     pub use pcl::polyfill::num::{One, Zero};
 }

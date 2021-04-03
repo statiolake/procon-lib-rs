@@ -10,16 +10,16 @@
 //! // use crate::pcl::math::group::Additive as A;
 //! let cumsum = CumSum::from_array(&[A(5), A(4), A(1), A(3), A(2), A(6)]);
 //! assert_eq!(cumsum.sum(0..6).0, 21);
-//! # #[cfg(feature = "rust2020")]
+//! # #[cfg(feature = "rust-131")]
 //! assert_eq!(cumsum.sum(0..=5).0, 21);
 //! assert_eq!(cumsum.sum(..6).0, 21);
-//! # #[cfg(feature = "rust2020")]
+//! # #[cfg(feature = "rust-131")]
 //! assert_eq!(cumsum.sum(..=5).0, 21);
 //! assert_eq!(cumsum.sum(0..).0, 21);
 //! assert_eq!(cumsum.sum(..).0, 21);
 //! assert_eq!(cumsum.sum(1..2).0, 4);
 //! assert_eq!(cumsum.sum(1..5).0, 10);
-//! # #[cfg(feature = "rust2020")]
+//! # #[cfg(feature = "rust-131")]
 //! assert_eq!(cumsum.sum(1..=1).0, 4);
 //! assert_eq!(cumsum.sum(1..0).0, 0);
 //! ```
@@ -67,8 +67,8 @@ impl<T: Group + Copy> CumSum<T> {
     pub fn from_array<A: AsRef<[T]>>(array: A) -> CumSum<T> {
         let array = array.as_ref();
         let mut psum = vec![T::id(); array.len() + 1];
+        // 古い Rust をサポートするため、 1..=array.len() は利用しない。
         for i in 0..array.len() {
-            // to support rust2016
             let i = i + 1;
             psum[i] = T::op(psum[i - 1], array[i - 1]);
         }
@@ -135,8 +135,8 @@ impl<T: Group + Copy> CumSum2D<T> {
         let width = array[0].as_ref().len();
         let mut psum = vec![vec![T::id(); width + 1]; height + 1];
 
+        // 古い Rust をサポートするため、 1..=height は利用しない。
         for i in 0..height {
-            // to support rust2016
             let i = i + 1;
             for j in 0..width {
                 let j = j + 1;
@@ -214,16 +214,16 @@ mod tests {
     fn check_cumsum() {
         let cumsum = CumSum::from_array(&[A(5), A(4), A(1), A(3), A(2), A(6)]);
         assert_eq!(cumsum.sum(0..6).0, 21);
-        #[cfg(feature = "rust2020")]
+        #[cfg(feature = "rust-131")]
         assert_eq!(cumsum.sum(0..=5).0, 21);
         assert_eq!(cumsum.sum(..6).0, 21);
-        #[cfg(feature = "rust2020")]
+        #[cfg(feature = "rust-131")]
         assert_eq!(cumsum.sum(..=5).0, 21);
         assert_eq!(cumsum.sum(0..).0, 21);
         assert_eq!(cumsum.sum(..).0, 21);
         assert_eq!(cumsum.sum(1..2).0, 4);
         assert_eq!(cumsum.sum(1..5).0, 10);
-        #[cfg(feature = "rust2020")]
+        #[cfg(feature = "rust-131")]
         assert_eq!(cumsum.sum(1..=1).0, 4);
         assert_eq!(cumsum.sum(1..0).0, 0);
 

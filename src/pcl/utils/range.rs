@@ -47,13 +47,13 @@ mod tests {
     #[test]
     fn check_bounds() {
         assert_eq!(range_start(&(0..1), 0), 0);
-        #[cfg(feature = "rust2020")]
+        #[cfg(feature = "rust-131")]
         assert_eq!(range_start(&(0..=1), 0), 0);
         assert_eq!(range_start(&(..1), 0), 0);
         assert_eq!(range_start(&(0..), 0), 0);
         assert_eq!(range_start(&(..), 0), 0);
         assert_eq!(range_end(&(0..1), 1), 1);
-        #[cfg(feature = "rust2020")]
+        #[cfg(feature = "rust-131")]
         assert_eq!(range_end(&(0..=1), 1), 1);
         assert_eq!(range_end(&(..1), 1), 1);
         assert_eq!(range_end(&(0..), 1), 1);

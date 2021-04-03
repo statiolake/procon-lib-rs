@@ -14,14 +14,14 @@
 //! # Example
 //!
 //! ```
-//! # #[cfg(feature = "rust2016")]
+//! # #[cfg(not(feature = "rust-131"))]
 //! # #[macro_use]
 //! # extern crate procon_lib;
-//! # #[cfg(feature = "rust2020")]
+//! # #[cfg(feature = "rust-131")]
 //! # use procon_lib::define_modint_const;
 //! # use procon_lib::pcl::math::modint::Modint;
 //! #
-//! // rust2020 ではインポートが必要。
+//! // 新しいバージョンの Rust ではインポートが必要。
 //! // use crate::define_modint_const;
 //! define_modint_const! {
 //!     pub const MOD5 = 5;
@@ -39,19 +39,19 @@
 
 /// `Modint` の法になる定数を定めるマクロを提供する。
 ///
-/// バージョン (rust2016, rust2020) によって異なるため別のモジュールに分けている。いずれの場合もトレ
-/// イト `ModintConst` を定義する型が定数として扱われるが、その値を rust2020 では関連定数 `MOD` で定
-/// 義していて、 rust2016 では `get_modulus()` で定義している。
-#[cfg(feature = "rust2020")]
+/// Rust のバージョンによって異なるため別のモジュールに分けている。いずれの場合もトレイト
+/// `ModintConst` を定義する型が定数として扱われるが、その値を 1.16+ では関連定数 `MOD` で定義してい
+/// て、 1.15 では `get_modulus()` で定義している。
+#[cfg(feature = "rust-131")]
 #[path = "consts_2020.rs"]
 #[macro_use]
 pub mod consts;
-#[cfg(feature = "rust2016")]
+#[cfg(not(feature = "rust-131"))]
 #[path = "consts_2016.rs"]
 #[macro_use]
 pub mod consts;
 
-#[cfg(feature = "rust2020")]
+#[cfg(feature = "crates-atc-2020")]
 use num::Num;
 
 use self::consts::ModintConst;
@@ -106,9 +106,9 @@ impl<C> Modint<C> {
 impl<C: ModintConst> Modint<C> {
     /// 新しい `Modint` を作成する。値は最初に丸められる。
     pub fn new(mut value: ModintInnerType) -> Modint<C> {
-        #[cfg(feature = "rust2020")]
+        #[cfg(feature = "rust-131")]
         let modulus = C::MOD;
-        #[cfg(feature = "rust2016")]
+        #[cfg(not(feature = "rust-131"))]
         let modulus = C::get_modulus();
 
         assert_ne!(modulus, 0, "MOD is 0");
@@ -122,9 +122,9 @@ impl<C: ModintConst> Modint<C> {
 
     /// 逆元を求める。
     pub fn inv(self) -> Modint<C> {
-        #[cfg(feature = "rust2020")]
+        #[cfg(feature = "rust-131")]
         let mut modulus = C::MOD;
-        #[cfg(feature = "rust2016")]
+        #[cfg(not(feature = "rust-131"))]
         let mut modulus = C::get_modulus();
 
         let mut a = self.value;
@@ -184,9 +184,9 @@ impl<C> Copy for Modint<C> {}
 
 impl<C: ModintConst> AddAssign for Modint<C> {
     fn add_assign(&mut self, rhs: Modint<C>) {
-        #[cfg(feature = "rust2020")]
+        #[cfg(feature = "rust-131")]
         let modulus = C::MOD;
-        #[cfg(feature = "rust2016")]
+        #[cfg(not(feature = "rust-131"))]
         let modulus = C::get_modulus();
 
         self.value += rhs.value;
@@ -198,9 +198,9 @@ impl<C: ModintConst> AddAssign for Modint<C> {
 
 impl<C: ModintConst> SubAssign for Modint<C> {
     fn sub_assign(&mut self, rhs: Modint<C>) {
-        #[cfg(feature = "rust2020")]
+        #[cfg(feature = "rust-131")]
         let modulus = C::MOD;
-        #[cfg(feature = "rust2016")]
+        #[cfg(not(feature = "rust-131"))]
         let modulus = C::get_modulus();
 
         self.value -= rhs.value;
@@ -212,9 +212,9 @@ impl<C: ModintConst> SubAssign for Modint<C> {
 
 impl<C: ModintConst> MulAssign for Modint<C> {
     fn mul_assign(&mut self, rhs: Modint<C>) {
-        #[cfg(feature = "rust2020")]
+        #[cfg(feature = "rust-131")]
         let modulus = C::MOD;
-        #[cfg(feature = "rust2016")]
+        #[cfg(not(feature = "rust-131"))]
         let modulus = C::get_modulus();
 
         self.value *= rhs.value;
@@ -270,9 +270,9 @@ impl_arith_by_assign!(impl Rem::rem { use %=; });
 
 impl<C: ModintConst> One for Modint<C> {
     fn one() -> Modint<C> {
-        #[cfg(feature = "rust2020")]
+        #[cfg(feature = "rust-131")]
         let modulus = C::MOD;
-        #[cfg(feature = "rust2016")]
+        #[cfg(not(feature = "rust-131"))]
         let modulus = C::get_modulus();
 
         assert_ne!(modulus, 1, "one() is called for Modint with MOD = 1");
@@ -308,7 +308,7 @@ impl<C> fmt::Display for Modint<C> {
     }
 }
 
-#[cfg(feature = "rust2020")]
+#[cfg(feature = "crates-atc-2020")]
 impl<C: ModintConst> Num for Modint<C> {
     type FromStrRadixErr = <ModintInnerType as Num>::FromStrRadixErr;
     fn from_str_radix(src: &str, radix: u32) -> Result<Self, Self::FromStrRadixErr> {
@@ -366,7 +366,7 @@ mod tests {
             M::new(4)
         );
 
-        #[cfg(feature = "rust2020")]
+        #[cfg(feature = "crates-atc-2020")]
         assert_eq!(num::pow(a, 10), M::new(4));
 
         let cs = CumSum::from_array(vec![A(M::new(3)), A(M::new(4)), A(M::new(2))]);
