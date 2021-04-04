@@ -17,7 +17,6 @@
 //! # use procon_lib::define_modint_const;
 //! # use procon_lib::pcl::math::modint::Modint;
 //! #
-//! // 新しいバージョンの Rust ではインポートが必要。
 //! // use crate::define_modint_const;
 //! define_modint_const! {
 //!     pub const MOD5 = 5;
@@ -25,12 +24,10 @@
 //!
 //! type M5 = Modint<MOD5>;
 //!
-//! # fn main() {
 //! assert_eq!(M5::new(10), M5::new(0));
 //! assert_eq!(M5::new(3) + M5::new(4), M5::new(2));
 //! assert_eq!(M5::new(4) / M5::new(2), M5::new(2));
 //! assert_eq!(M5::new(3) / M5::new(2), M5::new(4));
-//! # }
 //! ```
 
 /// `Modint` の法になる定数を定めるマクロを提供する。
@@ -80,9 +77,8 @@ impl<C> Modint<C> {
     ///
     /// - `0 <= value < C` を満たすこと。
     pub unsafe fn new_unchecked(value: ModintInnerType) -> Modint<C> {
-        #[allow(unknown_lints, renamed_and_removed_lints, redundant_field_names)]
         Modint {
-            value: value,
+            value,
             marker: PhantomData,
         }
     }

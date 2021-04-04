@@ -54,7 +54,7 @@ pub struct CumSum<T> {
     psum: Vec<T>,
 }
 
-#[allow(unknown_lints, renamed_and_removed_lints, len_without_is_empty)]
+#[allow(clippy::len_without_is_empty)]
 impl<T: Group + Copy> CumSum<T> {
     /// 与えられた数列の累積和をとり、 `CumSum` を生成する。
     ///
@@ -71,7 +71,7 @@ impl<T: Group + Copy> CumSum<T> {
         }
 
         #[allow(unknown_lints, renamed_and_removed_lints, redundant_field_names)]
-        CumSum { psum: psum }
+        CumSum { psum }
     }
 
     /// 指定された範囲内の総和を返す。
@@ -153,8 +153,7 @@ impl<T: Group + Copy> CumSum2D<T> {
             }
         }
 
-        #[allow(unknown_lints, renamed_and_removed_lints, redundant_field_names)]
-        CumSum2D { psum: psum }
+        CumSum2D { psum }
     }
 
     /// 指定された範囲内の総和を返す。

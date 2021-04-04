@@ -7,7 +7,6 @@
 //! ```
 //! # use procon_lib::pcl::collections::counter::Counter;
 //! #
-//! # fn main() {
 //! let slice = &[1, 2, 5, 3, 2, 1];
 //! let counter = Counter::from_slice(slice);
 //! assert_eq!(counter[&1], 2);
@@ -15,7 +14,6 @@
 //! assert_eq!(counter[&3], 1);
 //! assert_eq!(counter[&5], 1);
 //! assert_eq!(counter[&9], 0);
-//! # }
 //! ```
 
 use std::borrow::Borrow;
@@ -65,8 +63,7 @@ impl<T: Eq + Hash> FromIterator<T> for Counter<T> {
             *inner.entry(item).or_insert(0) += 1;
         }
 
-        #[allow(unknown_lints, renamed_and_removed_lints, redundant_field_names)]
-        Counter { inner: inner }
+        Counter { inner }
     }
 }
 

@@ -56,12 +56,7 @@ where
             v
         };
 
-        #[allow(unknown_lints, renamed_and_removed_lints, redundant_field_names)]
-        SegmentTree {
-            data: data,
-            lenexp2: lenexp2,
-            len: len,
-        }
+        SegmentTree { data, lenexp2, len }
     }
 
     /// あるインデックス `idx` の値を `value` に更新する。
@@ -74,11 +69,11 @@ where
         idx += self.lenexp2;
         self.data[idx] = value;
 
-        #[allow(unknown_lints, renamed_and_removed_lints, while_immutable_condition)]
-        while {
+        loop {
             idx >>= 1;
-            idx != 0
-        } {
+            if idx == 0 {
+                break;
+            }
             self.data[idx] = T::op(self.data[idx * 2], self.data[idx * 2 + 1]);
         }
     }
