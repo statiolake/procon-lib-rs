@@ -21,6 +21,7 @@
 ///
 /// 一方、これが `i32` ではなくユーザー定義型 (AddAssign が定義されている型) になると、挙動が異なる。
 /// ```compile_fail
+/// # #![deny(warnings)]
 /// use std::num::Wrapping;
 /// let mut v = vec![Wrapping(1), Wrapping(2)];
 /// v[0] += v[1]; // ERROR: cannot borrow `v` as immutable because it is also borrowed as mutable
