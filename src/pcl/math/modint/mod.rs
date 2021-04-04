@@ -57,8 +57,16 @@ define_modint_const! {
     pub const MOD17 = 1_000_000_007;
 }
 
+define_modint_const! {
+    #[doc = "998,244,353 を表す定数。"]
+    pub const MOD998244353 = 998_244_353;
+}
+
 /// 1e9+7 で割ったあまりを利用する `Modint` 。
 pub type Modint17 = Modint<MOD17>;
+
+/// 998,244,353 で割ったあまりを利用する `Modint` 。
+pub type Modint998244353 = Modint<MOD998244353>;
 
 /// 常にある法 `C` で割ったあまりを計算する整数型。
 pub struct Modint<C> {
