@@ -18,7 +18,7 @@ pub trait Monoid {
     fn id() -> Self;
 }
 
-use super::super::utils::num::{MaxValue, MinValue};
+use crate::pcl::traits::utils::num::{MaxValue, MinValue};
 use std::cmp::Ord;
 use std::cmp::{max, min};
 use std::fmt;

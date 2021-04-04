@@ -38,7 +38,7 @@ pub mod consts;
 use num::Num;
 
 use self::consts::ModintConst;
-use super::super::compat::num::{One, Zero};
+use crate::pcl::compat::num::{One, Zero};
 use std::cmp::Ordering;
 use std::fmt;
 use std::hash::{Hash, Hasher};
@@ -271,9 +271,9 @@ impl<C: ModintConst> Num for Modint<C> {
 
 #[cfg(test)]
 mod tests {
-    use super::super::super::traits::math::group::Additive as A;
-    use super::super::CumSum;
     use super::*;
+    use crate::pcl::math::CumSum;
+    use crate::pcl::traits::math::group::Additive as A;
 
     define_modint_const! {
         pub const MOD5 = 5;

@@ -43,8 +43,8 @@
 //! assert_eq!(cumsum2d.sum(1..2, 4..3).0, 0);
 //! ```
 
-use super::super::traits::Group;
-use super::super::utils::range;
+use crate::pcl::traits::Group;
+use crate::pcl::utils::range;
 use std::ops::RangeBounds;
 
 /// ある数列の、指定された範囲の和を高速に計算する。
@@ -203,8 +203,8 @@ impl<T: Group + Copy> CumSum2D<T> {
 
 #[cfg(test)]
 mod tests {
-    use super::super::super::traits::math::group::Additive as A;
     use super::*;
+    use crate::pcl::traits::math::group::Additive as A;
 
     #[test]
     #[allow(clippy::reversed_empty_ranges)]

@@ -21,8 +21,8 @@
 //! assert_eq!(st.query(1..3).0, 2);
 //! ```
 
-use super::super::traits::math::Monoid;
-use super::super::utils::range;
+use crate::pcl::traits::math::Monoid;
+use crate::pcl::utils::range;
 use std::fmt;
 use std::ops::RangeBounds;
 
@@ -131,8 +131,8 @@ fn calc_lenexp2(mut len: usize) -> usize {
 
 #[cfg(test)]
 mod tests {
-    use super::super::super::traits::math::monoid::Min;
     use super::*;
+    use crate::pcl::traits::math::monoid::Min;
 
     #[test]
     fn segment_tree_1() {

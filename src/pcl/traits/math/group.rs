@@ -14,7 +14,7 @@ pub trait Group: Monoid {
     fn inv(x: Self) -> Self;
 }
 
-use super::super::super::compat::num::Zero;
+use crate::pcl::compat::num::Zero;
 
 use std::ops::{Add, Neg};
 
