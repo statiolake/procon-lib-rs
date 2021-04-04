@@ -13,31 +13,36 @@ jobs:
           - yukicoder
 
         include:
+          - environment: rust-150
+            toolchain: 1.50.0-x86_64-unknown-linux-gnu
+            os: ubuntu-latest
+            clippy: true
+
           - environment: atc-2020
             toolchain: 1.42.0-x86_64-unknown-linux-gnu
             os: ubuntu-latest
-            clippy: true
+            clippy: false
           - environment: aoj
             toolchain: 1.41.1-x86_64-unknown-linux-gnu
             os: ubuntu-latest
-            clippy: true
+            clippy: false
             # FIXME: AOJ uses 2015 edition!
           - environment: codeforces
             toolchain: 1.49.0-x86_64-unknown-linux-gnu
             os: ubuntu-latest
-            clippy: true
+            clippy: false
           - environment: codingame
             toolchain: 1.38.0-x86_64-unknown-linux-gnu
             os: ubuntu-latest
-            clippy: true
+            clippy: false
           - environment: library-checker
             toolchain: 1.47.0-x86_64-unknown-linux-gnu
             os: ubuntu-latest
-            clippy: true
+            clippy: false
           - environment: yukicoder
             toolchain: 1.50.0-x86_64-unknown-linux-gnu
             os: ubuntu-latest
-            clippy: true
+            clippy: false
     name: ${{ matrix.environment }}
     runs-on: ${{ matrix.os }}
 
@@ -56,7 +61,7 @@ jobs:
           override: true
           profile: default
 
-      - name: "`cargo clippy --all-targets --profile test -- -D warnings`"
+      - name: "`cargo clippy --all-targets --all-features --profile test -- -D warnings`"
         if: matrix.clippy
         uses: actions-rs/cargo@v1
         with:
