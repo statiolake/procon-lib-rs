@@ -6,8 +6,7 @@
 //! `range_end`を追加する。
 
 use std::cmp;
-
-use super::super::compat::std::ops::{Bound, RangeBounds};
+use std::ops::{Bound, RangeBounds};
 
 /// 範囲から始点を得る関数。範囲はこのインデックスを "含む" (半開区間) 。
 ///
@@ -47,13 +46,11 @@ mod tests {
     #[test]
     fn check_bounds() {
         assert_eq!(range_start(&(0..1), 0), 0);
-        #[cfg(feature = "rust-131")]
         assert_eq!(range_start(&(0..=1), 0), 0);
         assert_eq!(range_start(&(..1), 0), 0);
         assert_eq!(range_start(&(0..), 0), 0);
         assert_eq!(range_start(&(..), 0), 0);
         assert_eq!(range_end(&(0..1), 1), 1);
-        #[cfg(feature = "rust-131")]
         assert_eq!(range_end(&(0..=1), 1), 1);
         assert_eq!(range_end(&(..1), 1), 1);
         assert_eq!(range_end(&(0..), 1), 1);

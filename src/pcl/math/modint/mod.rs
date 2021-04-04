@@ -14,10 +14,6 @@
 //! # Example
 //!
 //! ```
-//! # #[cfg(not(feature = "rust-131"))]
-//! # #[macro_use]
-//! # extern crate procon_lib;
-//! # #[cfg(feature = "rust-131")]
 //! # use procon_lib::define_modint_const;
 //! # use procon_lib::pcl::math::modint::Modint;
 //! #
@@ -42,12 +38,6 @@
 /// Rust のバージョンによって異なるため別のモジュールに分けている。いずれの場合もトレイト
 /// `ModintConst` を定義する型が定数として扱われるが、その値を 1.16+ では関連定数 `MOD` で定義してい
 /// て、 1.15 では `get_modulus()` で定義している。
-#[cfg(feature = "rust-131")]
-#[path = "consts_2020.rs"]
-#[macro_use]
-pub mod consts;
-#[cfg(not(feature = "rust-131"))]
-#[path = "consts_2016.rs"]
 #[macro_use]
 pub mod consts;
 
@@ -106,27 +96,18 @@ impl<C> Modint<C> {
 impl<C: ModintConst> Modint<C> {
     /// 新しい `Modint` を作成する。値は最初に丸められる。
     pub fn new(mut value: ModintInnerType) -> Modint<C> {
-        #[cfg(feature = "rust-131")]
-        let modulus = C::MOD;
-        #[cfg(not(feature = "rust-131"))]
-        let modulus = C::get_modulus();
-
-        assert_ne!(modulus, 0, "MOD is 0");
+        assert_ne!(C::MOD, 0, "MOD is 0");
         if value < 0 {
-            let m = (-value) / modulus;
-            value += (m + 1) * modulus;
+            let m = (-value) / C::MOD;
+            value += (m + 1) * C::MOD;
         }
 
-        unsafe { Modint::new_unchecked(value % modulus) }
+        unsafe { Modint::new_unchecked(value % C::MOD) }
     }
 
     /// 逆元を求める。
     pub fn inv(self) -> Modint<C> {
-        #[cfg(feature = "rust-131")]
         let mut modulus = C::MOD;
-        #[cfg(not(feature = "rust-131"))]
-        let mut modulus = C::get_modulus();
-
         let mut a = self.value;
         let mut u = 1;
         let mut v = 0;
@@ -184,41 +165,26 @@ impl<C> Copy for Modint<C> {}
 
 impl<C: ModintConst> AddAssign for Modint<C> {
     fn add_assign(&mut self, rhs: Modint<C>) {
-        #[cfg(feature = "rust-131")]
-        let modulus = C::MOD;
-        #[cfg(not(feature = "rust-131"))]
-        let modulus = C::get_modulus();
-
         self.value += rhs.value;
-        if self.value >= modulus {
-            self.value -= modulus;
+        if self.value >= C::MOD {
+            self.value -= C::MOD;
         }
     }
 }
 
 impl<C: ModintConst> SubAssign for Modint<C> {
     fn sub_assign(&mut self, rhs: Modint<C>) {
-        #[cfg(feature = "rust-131")]
-        let modulus = C::MOD;
-        #[cfg(not(feature = "rust-131"))]
-        let modulus = C::get_modulus();
-
         self.value -= rhs.value;
         if self.value < 0 {
-            self.value += modulus;
+            self.value += C::MOD;
         }
     }
 }
 
 impl<C: ModintConst> MulAssign for Modint<C> {
     fn mul_assign(&mut self, rhs: Modint<C>) {
-        #[cfg(feature = "rust-131")]
-        let modulus = C::MOD;
-        #[cfg(not(feature = "rust-131"))]
-        let modulus = C::get_modulus();
-
         self.value *= rhs.value;
-        self.value %= modulus;
+        self.value %= C::MOD;
     }
 }
 
@@ -270,12 +236,7 @@ impl_arith_by_assign!(impl Rem::rem { use %=; });
 
 impl<C: ModintConst> One for Modint<C> {
     fn one() -> Modint<C> {
-        #[cfg(feature = "rust-131")]
-        let modulus = C::MOD;
-        #[cfg(not(feature = "rust-131"))]
-        let modulus = C::get_modulus();
-
-        assert_ne!(modulus, 1, "one() is called for Modint with MOD = 1");
+        assert_ne!(C::MOD, 1, "one() is called for Modint with MOD = 1");
         unsafe { Modint::new_unchecked(1) }
     }
 }

@@ -1,8 +1,7 @@
 use super::ModintInnerType;
 
-// polyfill: return value from function
 pub trait ModintConst {
-    fn get_modulus() -> ModintInnerType;
+    const MOD: ModintInnerType;
 }
 
 /// `Modint` の定数 (`ModintConst` を実装する型) を簡単に定義するためのマクロ。
@@ -10,9 +9,6 @@ pub trait ModintConst {
 /// # Examples
 ///
 /// ```
-/// # #[cfg(not(feature = "rust-131"))]
-/// # #[macro_use] extern crate procon_lib;
-/// # #[cfg(feature = "rust-131")]
 /// # use procon_lib::define_modint_const;
 /// // use crate::define_modint_const;
 /// define_modint_const! {
@@ -25,16 +21,13 @@ pub trait ModintConst {
 /// #
 /// # fn main() {}
 /// ```
-// polyfill: use function instead
 #[macro_export]
 macro_rules! define_modint_const {
-    ($(#[doc = $doc:expr])* pub const $name:ident = $value:expr;) => {
+    ($(#[doc = $doc:expr])* pub const $name:ident = $value:literal;) => {
         $(#[doc = $doc])*
         pub enum $name {}
         impl $crate::pcl::math::modint::consts::ModintConst for $name {
-            fn get_modulus() -> $crate::pcl::math::modint::ModintInnerType {
-                $value
-            }
+            const MOD: $crate::pcl::math::modint::ModintInnerType = $value;
         }
     };
 }

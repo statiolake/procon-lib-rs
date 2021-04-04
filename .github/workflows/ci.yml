@@ -9,10 +9,6 @@ jobs:
           - 1.42.0-x86_64-pc-windows-gnu
           - 1.42.0-x86_64-apple-darwin
           - 1.42.0-x86_64-unknown-linux-gnu
-          - 1.15.0-x86_64-pc-windows-msvc
-          - 1.15.0-x86_64-pc-windows-gnu
-          - 1.15.0-x86_64-apple-darwin
-          - 1.15.0-x86_64-unknown-linux-gnu
         include:
           - toolchain: 1.42.0-x86_64-pc-windows-msvc
             os: windows-latest
@@ -30,22 +26,6 @@ jobs:
             os: ubuntu-latest
             clippy: true
             features: atc-2020
-          - toolchain: 1.15.0-x86_64-pc-windows-msvc
-            os: windows-latest
-            clippy: false
-            features: atc-2016
-          - toolchain: 1.15.0-x86_64-pc-windows-gnu
-            os: windows-latest
-            clippy: false
-            features: atc-2016
-          - toolchain: 1.15.0-x86_64-apple-darwin
-            os: macOS-latest
-            clippy: false
-            features: atc-2016
-          - toolchain: 1.15.0-x86_64-unknown-linux-gnu
-            os: ubuntu-latest
-            clippy: false
-            features: atc-2016
     name: ${{ matrix.toolchain }}
     runs-on: ${{ matrix.os }}
 

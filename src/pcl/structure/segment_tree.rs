@@ -21,10 +21,10 @@
 //! assert_eq!(st.query(1..3).0, 2);
 //! ```
 
-use super::super::compat::std::ops::RangeBounds;
 use super::super::traits::math::Monoid;
 use super::super::utils::range;
 use std::fmt;
+use std::ops::RangeBounds;
 
 /// セグメント木。
 pub struct SegmentTree<T> {
@@ -147,7 +147,6 @@ mod tests {
         st.update(2, Min(3));
         println!("{:?}", st);
         assert_eq!(st.query(0..3).0, 1);
-        #[cfg(feature = "rust-131")]
         assert_eq!(st.query(0..=2).0, 1);
         assert_eq!(st.query(1..3).0, 2);
     }

@@ -10,16 +10,13 @@
 //! // use crate::pcl::math::group::Additive as A;
 //! let cumsum = CumSum::from_array(&[A(5), A(4), A(1), A(3), A(2), A(6)]);
 //! assert_eq!(cumsum.sum(0..6).0, 21);
-//! # #[cfg(feature = "rust-131")]
 //! assert_eq!(cumsum.sum(0..=5).0, 21);
 //! assert_eq!(cumsum.sum(..6).0, 21);
-//! # #[cfg(feature = "rust-131")]
 //! assert_eq!(cumsum.sum(..=5).0, 21);
 //! assert_eq!(cumsum.sum(0..).0, 21);
 //! assert_eq!(cumsum.sum(..).0, 21);
 //! assert_eq!(cumsum.sum(1..2).0, 4);
 //! assert_eq!(cumsum.sum(1..5).0, 10);
-//! # #[cfg(feature = "rust-131")]
 //! assert_eq!(cumsum.sum(1..=1).0, 4);
 //! assert_eq!(cumsum.sum(1..0).0, 0);
 //! ```
@@ -46,9 +43,9 @@
 //! assert_eq!(cumsum2d.sum(1..2, 4..3).0, 0);
 //! ```
 
-use super::super::compat::std::ops::RangeBounds;
 use super::super::traits::Group;
 use super::super::utils::range;
+use std::ops::RangeBounds;
 
 /// ある数列の、指定された範囲の和を高速に計算する。
 ///
@@ -211,19 +208,17 @@ mod tests {
     use super::*;
 
     #[test]
+    #[allow(clippy::reversed_empty_ranges)]
     fn check_cumsum() {
         let cumsum = CumSum::from_array(&[A(5), A(4), A(1), A(3), A(2), A(6)]);
         assert_eq!(cumsum.sum(0..6).0, 21);
-        #[cfg(feature = "rust-131")]
         assert_eq!(cumsum.sum(0..=5).0, 21);
         assert_eq!(cumsum.sum(..6).0, 21);
-        #[cfg(feature = "rust-131")]
         assert_eq!(cumsum.sum(..=5).0, 21);
         assert_eq!(cumsum.sum(0..).0, 21);
         assert_eq!(cumsum.sum(..).0, 21);
         assert_eq!(cumsum.sum(1..2).0, 4);
         assert_eq!(cumsum.sum(1..5).0, 10);
-        #[cfg(feature = "rust-131")]
         assert_eq!(cumsum.sum(1..=1).0, 4);
         assert_eq!(cumsum.sum(1..0).0, 0);
 
@@ -231,6 +226,7 @@ mod tests {
     }
 
     #[test]
+    #[allow(clippy::reversed_empty_ranges)]
     fn check_cumsum2d() {
         let cumsum2d = CumSum2D::from_matrix(vec![
             vec![A(4), A(2), A(3), A(6), A(1)],
