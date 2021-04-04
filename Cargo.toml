@@ -7,12 +7,17 @@ edition = "2018"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [features]
-default = ["rust-142", "crates-atc-2020"]
+default = ["atc-2020"]
+
+atc-2020 = ["rust-142", "crates-atc-2020"]
+atc-2016 = ["rust-115"]
+
 rust-115 = []
 rust-131 = ["rust-115"]
 rust-140 = ["rust-131"]
 rust-141 = ["rust-140"]
 rust-142 = ["rust-141"]
+
 crates-atc-2020 = [
     "num",
     "num-bigint",

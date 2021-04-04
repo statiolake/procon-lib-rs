@@ -17,35 +17,35 @@ jobs:
           - toolchain: 1.42.0-x86_64-pc-windows-msvc
             os: windows-latest
             clippy: true
-            features: rust-142,crates-atc-2020
+            features: atc-2020
           - toolchain: 1.42.0-x86_64-pc-windows-gnu
             os: windows-latest
             clippy: true
-            features: rust-142,crates-atc-2020
+            features: atc-2020
           - toolchain: 1.42.0-x86_64-apple-darwin
             os: macOS-latest
             clippy: true
-            features: rust-142,crates-atc-2020
+            features: atc-2020
           - toolchain: 1.42.0-x86_64-unknown-linux-gnu
             os: ubuntu-latest
             clippy: true
-            features: rust-142,crates-atc-2020
+            features: atc-2020
           - toolchain: 1.15.0-x86_64-pc-windows-msvc
             os: windows-latest
             clippy: false
-            features: rust-115
+            features: atc-2016
           - toolchain: 1.15.0-x86_64-pc-windows-gnu
             os: windows-latest
             clippy: false
-            features: rust-115
+            features: atc-2016
           - toolchain: 1.15.0-x86_64-apple-darwin
             os: macOS-latest
             clippy: false
-            features: rust-115
+            features: atc-2016
           - toolchain: 1.15.0-x86_64-unknown-linux-gnu
             os: ubuntu-latest
             clippy: false
-            features: rust-115
+            features: atc-2016
     name: ${{ matrix.toolchain }}
     runs-on: ${{ matrix.os }}
 
