@@ -10,11 +10,20 @@ edition = "2018"
 default = ["atc-2020"]
 
 atc-2020 = ["rust-142", "crates-atc-2020"]
+aoj = ["rust-141"]
+codeforces = ["rust-149"]
+codingame = ["rust-138", "crates-codingame"]
+library-checker = ["rust-147"]
+yukicoder = ["rust-150"]
 
 rust-131 = []
-rust-140 = ["rust-131"]
+rust-138 = ["rust-131"]
+rust-140 = ["rust-138"]
 rust-141 = ["rust-140"]
 rust-142 = ["rust-141"]
+rust-147 = ["rust-142"]
+rust-149 = ["rust-147"]
+rust-150 = ["rust-149"]
 
 crates-atc-2020 = [
     "num",
@@ -54,6 +63,7 @@ crates-atc-2020 = [
     "rustc-hash",
     "smallvec",
 ]
+crates-codingame = []
 
 [dependencies]
 # AtCoder 2020年言語アップデート以降に使用できるクレート。

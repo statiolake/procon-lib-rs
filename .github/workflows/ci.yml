@@ -4,28 +4,40 @@ jobs:
   build:
     strategy:
       matrix:
-        toolchain:
-          - 1.42.0-x86_64-pc-windows-msvc
-          - 1.42.0-x86_64-pc-windows-gnu
-          - 1.42.0-x86_64-apple-darwin
-          - 1.42.0-x86_64-unknown-linux-gnu
+        environment:
+          - atc-2020
+          - aoj
+          - codeforces
+          - codingame
+          - library-checker
+          - yukicoder
+
         include:
-          - toolchain: 1.42.0-x86_64-pc-windows-msvc
-            os: windows-latest
-            clippy: true
-            features: atc-2020
-          - toolchain: 1.42.0-x86_64-pc-windows-gnu
-            os: windows-latest
-            clippy: true
-            features: atc-2020
-          - toolchain: 1.42.0-x86_64-apple-darwin
-            os: macOS-latest
-            clippy: true
-            features: atc-2020
-          - toolchain: 1.42.0-x86_64-unknown-linux-gnu
+          - environment: atc-2020
+            toolchain: 1.42.0-x86_64-unknown-linux-gnu
             os: ubuntu-latest
             clippy: true
-            features: atc-2020
+          - environment: aoj
+            toolchain: 1.41.1-x86_64-unknown-linux-gnu
+            os: ubuntu-latest
+            clippy: true
+            # FIXME: AOJ uses 2015 edition!
+          - environment: codeforces
+            toolchain: 1.49.0-x86_64-unknown-linux-gnu
+            os: ubuntu-latest
+            clippy: true
+          - environment: codingame
+            toolchain: 1.38.0-x86_64-unknown-linux-gnu
+            os: ubuntu-latest
+            clippy: true
+          - environment: library-checker
+            toolchain: 1.47.0-x86_64-unknown-linux-gnu
+            os: ubuntu-latest
+            clippy: true
+          - environment: yukicoder
+            toolchain: 1.50.0-x86_64-unknown-linux-gnu
+            os: ubuntu-latest
+            clippy: true
     name: ${{ matrix.toolchain }}
     runs-on: ${{ matrix.os }}
 
@@ -55,4 +67,4 @@ jobs:
         uses: actions-rs/cargo@v1
         with:
           command: test
-          args: --no-default-features --features ${{ matrix.features }}
+          args: --no-default-features --features ${{ matrix.environment }}
