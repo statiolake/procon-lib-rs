@@ -207,7 +207,7 @@ mod tests {
     use super::*;
 
     #[test]
-    #[allow(clippy::reversed_empty_ranges)]
+    #[allow(clippy::unknown_clippy_lints, clippy::reversed_empty_ranges)]
     fn check_cumsum() {
         let cumsum = CumSum::from_array(&[A(5), A(4), A(1), A(3), A(2), A(6)]);
         assert_eq!(cumsum.sum(0..6).0, 21);
@@ -225,7 +225,7 @@ mod tests {
     }
 
     #[test]
-    #[allow(clippy::reversed_empty_ranges)]
+    #[allow(clippy::unknown_clippy_lints, clippy::reversed_empty_ranges)]
     fn check_cumsum2d() {
         let cumsum2d = CumSum2D::from_matrix(vec![
             vec![A(4), A(2), A(3), A(6), A(1)],
