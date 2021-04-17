@@ -12,12 +12,12 @@ pub trait ModintConst {
 /// # use procon_lib::define_modint_const;
 /// // use crate::define_modint_const;
 /// define_modint_const! {
-///     pub const MOD11 = 11;
+///     pub const Mod11 = 11;
 /// }
 ///
 /// # use procon_lib::pcl::math::Modint;
 /// // use pcl::math::Modint;
-/// type M11 = Modint<MOD11>;
+/// type M11 = Modint<Mod11>;
 /// #
 /// # fn main() {}
 /// ```

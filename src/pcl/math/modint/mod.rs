@@ -6,7 +6,7 @@
 //! どの意味がそもそもなくなっているからである。
 //!
 //! 実際に法を指定するときは、特別なトレイトを実装した型 (「定数」) を用意してジェネリクスとして
-//! `Modint` に与える。例えば定数 1e9+7 を表す型は `MOD17` である。それを使った`Modint<MOD17>` はよ
+//! `Modint` に与える。例えば定数 1e9+7 を表す型は `Mod17` である。それを使った`Modint<Mod17>` はよ
 //! く使われると考えられるので `Modint17` のエイリアスを用意している。
 //!
 //! 任意の定数を法に指定する方法を含めて、使い方は次の通りである。
@@ -19,10 +19,10 @@
 //! #
 //! // use crate::define_modint_const;
 //! define_modint_const! {
-//!     pub const MOD5 = 5;
+//!     pub const Mod5 = 5;
 //! }
 //!
-//! type M5 = Modint<MOD5>;
+//! type M5 = Modint<Mod5>;
 //!
 //! assert_eq!(M5::new(10), M5::new(0));
 //! assert_eq!(M5::new(3) + M5::new(4), M5::new(2));
@@ -54,19 +54,19 @@ pub type ModintInnerType = i64;
 
 define_modint_const! {
     #[doc = "1e9+7 を表す定数。"]
-    pub const MOD17 = 1_000_000_007;
+    pub const Mod17 = 1_000_000_007;
 }
 
 define_modint_const! {
     #[doc = "998,244,353 を表す定数。"]
-    pub const MOD998244353 = 998_244_353;
+    pub const Mod998244353 = 998_244_353;
 }
 
 /// 1e9+7 で割ったあまりを利用する `Modint` 。
-pub type Modint17 = Modint<MOD17>;
+pub type Modint17 = Modint<Mod17>;
 
 /// 998,244,353 で割ったあまりを利用する `Modint` 。
-pub type Modint998244353 = Modint<MOD998244353>;
+pub type Modint998244353 = Modint<Mod998244353>;
 
 /// 常にある法 `C` で割ったあまりを計算する整数型。
 pub struct Modint<C> {
@@ -284,10 +284,10 @@ mod tests {
     use crate::pcl::traits::math::group::Additive as A;
 
     define_modint_const! {
-        pub const MOD5 = 5;
+        pub const Mod5 = 5;
     }
 
-    type M = Modint<MOD5>;
+    type M = Modint<Mod5>;
 
     #[test]
     fn modint() {

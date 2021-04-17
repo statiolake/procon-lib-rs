@@ -7,7 +7,7 @@ use super::monoid::Monoid;
 /// M が群であるとは、M が次の条件を満たす集合であることをいう。
 ///
 /// - モノイドである
-/// - 逆元の存在  
+/// - 逆元の存在
 ///     任意の M の元 x に対して inv(x) が存在して op(x, inv(x)) = x 。
 pub trait Group: Monoid {
     /// 逆元
@@ -20,7 +20,7 @@ use std::ops::{Add, Neg};
 
 /// 群の実装 : 加法群
 ///
-/// 単位元を Zero 、演算を Add 、逆元を Neg によって提供するラッパー。
+/// 単位元を `Zero` 、演算を `Add` 、逆元を `Neg` によって提供するラッパー。
 #[derive(Debug)]
 pub struct Additive<T>(pub T);
 

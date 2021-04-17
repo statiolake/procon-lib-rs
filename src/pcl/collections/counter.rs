@@ -1,6 +1,6 @@
 //! 与えられた配列の中に、同じ要素が何個ずつあるかをカウントする。
 //!
-//! 内部的には単に HashMap を利用している。
+//! 内部的には単に `HashMap` を利用している。
 //!
 //! # Example
 //!
@@ -32,15 +32,15 @@ where
     T: Deref,
     <T as Deref>::Target: Eq + Hash,
 {
-    /// スライスから Counter を生成する。得られる Counter は deref されたものになる。これは
-    /// &[&String] から &str のカウンタを作るときなどに便利。
+    /// スライスから `Counter` を生成する。得られる `Counter` は deref されたものになる。これは
+    /// `&[&String]` から `&str` のカウンタを作るときなどに便利。
     pub fn from_slice_deref(slice: &[T]) -> Counter<&<T as Deref>::Target> {
         slice.iter().map(|x| &**x).collect()
     }
 }
 
 impl<T: Eq + Hash> Counter<T> {
-    /// スライスから Counter を生成する。
+    /// スライスから `Counter` を生成する。
     pub fn from_slice(slice: &[T]) -> Counter<&T> {
         slice.iter().collect()
     }

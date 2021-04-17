@@ -4,7 +4,7 @@
 //!
 //! - ある 1 要素の値の更新 (`update`) ― O(log n)
 //! - ある区間の値にそのモノイドの演算を適用した結果を返す (`query`) ― O(log n)
-//!     - 例えば Additive であれば区間の和、 Min であれば Range Minimum Query 。
+//!     - 例えば `Additive` であれば区間の和、`Min` であれば Range Minimum Query 。
 //!
 //! # Examples
 //!
@@ -80,8 +80,7 @@ where
 
     /// ある区間 `range` の各要素に順に演算を適用して、結果を返す。
     ///
-    /// たとえばモノイド `Min` であれば、ある区間の最小値を返す。 (Range Minimum
-    /// Query)
+    /// たとえばモノイド `Min` であれば、ある区間の最小値を返す。 (Range Minimum Query)
     ///
     /// # 計算量
     ///
@@ -114,9 +113,9 @@ where
     }
 }
 
-/// 2 の冪乗であって最初に len 以上になるような値を求める。
+/// 2 の冪乗であって最初に `len` 以上になるような値を求める。
 ///
-/// すなわち、 2^m >= len となるような最小の 2^m の値を求める。
+/// すなわち、 2^m >= `len` となるような最小の 2^m の値を求める。
 fn calc_lenexp2(mut len: usize) -> usize {
     len -= 1;
     len |= len >> 1;
