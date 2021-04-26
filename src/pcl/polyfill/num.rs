@@ -1,3 +1,6 @@
+use std::cmp::PartialEq;
+use std::ops::{Add, Div, Mul, Rem, Sub};
+
 pub trait Zero {
     fn zero() -> Self;
     fn is_zero(&self) -> bool;
@@ -39,3 +42,14 @@ impl_for_primitive!(i64; 0, 1);
 impl_for_primitive!(isize; 0, 1);
 impl_for_primitive!(f32; 0.0, 1.0);
 impl_for_primitive!(f64; 0.0, 1.0);
+
+pub trait NumOps<Rhs = Self, Output = Self>:
+    Add<Rhs, Output = Output>
+    + Sub<Rhs, Output = Output>
+    + Mul<Rhs, Output = Output>
+    + Div<Rhs, Output = Output>
+    + Rem<Rhs, Output = Output>
+{
+}
+
+pub trait Num: Zero + One + NumOps<Self, Self> + PartialEq<Self> {}
