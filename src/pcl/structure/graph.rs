@@ -29,12 +29,15 @@
 //! graph.add_edges(edges);
 //! ```
 
+use crate::pcl::compat::num::Zero;
 use crate::pcl::traits::math::graph::{Edge, Graph, ProvideAdjacencies, ReadonlyGraph, Undirected};
 use crate::{member_name_of, type_name_of};
+use std::cmp::PartialOrd;
 use std::collections::HashSet;
 use std::convert::TryFrom;
 use std::fmt;
 use std::iter;
+use std::ops::Add;
 
 /// 辺をリストとして所持するタイプのグラフ。
 pub struct EdgeList<C> {
@@ -313,6 +316,41 @@ impl<C> Tree<C> {
     }
 }
 
+impl<C> Tree<C>
+where
+    C: Zero + for<'c> Add<&'c C, Output = C> + PartialOrd,
+{
+    /// 直径を求める
+    pub fn diameter(&self) -> C {
+        fn max_depth<C>(graph: &Tree<C>, idx: usize, stepped: &mut HashSet<usize>) -> (C, usize)
+        where
+            C: Zero + for<'c> Add<&'c C, Output = C> + PartialOrd,
+        {
+            let mut res = None;
+            assert!(stepped.insert(idx));
+            for edge in graph
+                .get_adjacencies(idx)
+                .expect("vertex index out of bounds")
+            {
+                if stepped.contains(&edge.to) {
+                    continue;
+                }
+                let (further_cost, furthest) = max_depth(graph, edge.to, stepped);
+                let total_cost = further_cost + &edge.cost;
+                if Some(&total_cost) > res.as_ref().map(|(cost, _)| cost) {
+                    res = Some((total_cost, furthest));
+                }
+            }
+
+            res.unwrap_or((C::zero(), idx))
+        }
+
+        let (_, furthest) = max_depth(self, 0, &mut HashSet::new());
+        let (d, _) = max_depth(self, furthest, &mut HashSet::new());
+        d
+    }
+}
+
 #[cfg(feature = "rust-138")]
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 /// ツリーに変換できなかった理由を示す。
@@ -484,5 +522,23 @@ mod tests {
             Tree::try_from(graph),
             Err(TreeTryFromError::HasCycle),
         ));
+    }
+
+    #[test]
+    fn test_tree_diameter() {
+        let mut graph = UndirectedAdjacencyList::<i32>::of_size(10);
+        graph.add_edges(vec![
+            (0, 1),
+            (0, 2),
+            (1, 3),
+            (3, 4),
+            (3, 5),
+            (2, 6),
+            (6, 7),
+            (7, 8),
+            (7, 9),
+        ]);
+        let tree = Tree::try_from(graph).expect("this is indeed tree");
+        assert_eq!(tree.diameter(), 7);
     }
 }
