@@ -1,3 +1,4 @@
-//! ユーティリティ関数を定義する。
+//! ユーティリティを定義する。
 
+pub mod macros;
 pub mod range;
