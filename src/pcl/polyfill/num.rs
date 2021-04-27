@@ -1,12 +1,12 @@
 use std::cmp::PartialEq;
 use std::ops::{Add, Div, Mul, Rem, Sub};
 
-pub trait Zero {
+pub trait Zero: Sized + Add<Self, Output = Self> {
     fn zero() -> Self;
     fn is_zero(&self) -> bool;
 }
 
-pub trait One {
+pub trait One: Sized + Mul<Self, Output = Self> {
     fn one() -> Self;
 }
 
@@ -52,4 +52,4 @@ pub trait NumOps<Rhs = Self, Output = Self>:
 {
 }
 
-pub trait Num: Zero + One + NumOps<Self, Self> + PartialEq<Self> {}
+pub trait Num: Zero + One + NumOps + PartialEq<Self> {}
