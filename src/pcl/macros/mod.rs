@@ -6,6 +6,7 @@
 //! 実際のドキュメントはクレートのルートに配置されている。
 //!
 //! - [`rtl!`](../../macro.rtl.html) ― 複合代入演算子を右辺から評価するマクロ。
+//! - [`matches!`](../../macro.matches.html) ― 標準の matches! と同様のもの (polyfill) 。
 
 /// 複合代入演算子を右辺から評価するマクロ。
 ///
@@ -78,4 +79,18 @@ macro_rules! rtl {
     ($($rest:tt)*) => {
         rtl!(@lhs () @rest $($rest)*)
     };
+}
+
+/// 値がパターンにマッチするかどうかを返すマクロ。Rust 1.42 から標準入りした `matches!` と全く同様な
+/// ので、Rust 1.42 以降をターゲットとする場合には見えないようになっている。
+// そのまま標準ライブラリからコピーしてきた。
+#[cfg(not(feature = "rust-142"))]
+#[macro_export]
+macro_rules! matches {
+    ($expression:expr, $( $pattern:pat )|+ $( if $guard: expr )? $(,)?) => {
+        match $expression {
+            $( $pattern )|+ $( if $guard )? => true,
+            _ => false
+        }
+    }
 }

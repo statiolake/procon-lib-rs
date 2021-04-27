@@ -502,6 +502,9 @@ mod tests {
 
     #[test]
     fn test_tree() {
+        #[cfg(not(feature = "rust-142"))]
+        use crate::matches;
+
         let mut graph = UndirectedAdjacencyList::<i32>::of_size(9);
         let edges = [(0, 2), (0, 3), (1, 4), (1, 5), (1, 6), (2, 7), (2, 8)];
         graph.add_edges(edges.iter().copied());
