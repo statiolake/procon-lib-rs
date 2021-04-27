@@ -510,7 +510,7 @@ mod tests {
         graph.add_edges(edges.iter().copied());
         assert!(matches!(
             Tree::try_from(graph.clone()),
-            Err(TreeTryFromError::NotConnected),
+            Err(TreeTryFromError::NotConnected)
         ));
 
         graph.add_edge((0, 1));
@@ -523,7 +523,7 @@ mod tests {
         graph.add_edge((1, 2));
         assert!(matches!(
             Tree::try_from(graph),
-            Err(TreeTryFromError::HasCycle),
+            Err(TreeTryFromError::HasCycle)
         ));
     }
 
